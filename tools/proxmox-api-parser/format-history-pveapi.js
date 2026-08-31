@@ -206,10 +206,10 @@ function friendlyVersion(entry) {
  * Returns a Map of format_name → { code_hash, line_context }
  *
  * We extract:
- *   register_format('name', \\&validator)
+ *   register_format('name', \&validator)
  *   register_format('name', { ... })
  *   register_format('name', $hashref)
- *   register_format('name', $hashref, \\&validator)
+ *   register_format('name', $hashref, \&validator)
  *
  * We also look for known enum patterns like $valid_privs and $privgroups
  * to detect when enum values change.
@@ -307,7 +307,7 @@ function extractFormatValues(formatName, source) {
       // These are validated in parse_hotplug_features — look for the valid key checks
       const featMatch = source.match(/my\s+\$res\s*=\s*\{\}[\s\S]*?return\s+\$res/);
       if (featMatch) {
-        const keys = [...featMatch[0].matchAll(/\$res->\{['\"]?(\w+)['\"]?\}/g)].map(m => m[1]);
+        const keys = [...featMatch[0].matchAll(/\$res->\{['"]?(\w+)['"]?\}/g)].map(m => m[1]);
         if (keys.length > 0) return { type: 'enum', values: [...new Set(keys)].sort() };
       }
       return null;
