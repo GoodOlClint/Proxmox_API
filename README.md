@@ -36,7 +36,7 @@ bash tools/proxmox-api-parser/update-pveapi.sh   # PVE → pve/
 bash tools/proxmox-api-parser/update-pbsapi.sh   # PBS → pbs/
 ```
 
-The PVE script fetches the live `apidoc.js` from pve.proxmox.com, clones the pve-docs repo to rebuild per-endpoint version history from its full commit log, and regenerates everything under `pve/`. The PBS script fetches `apidoc.js` from pbs.proxmox.com (same format, so the same parser handles both). A [scheduled GitHub Actions workflow](.github/workflows/update-pveapi.yml) does both daily and commits when upstream changed.
+The PVE script fetches the live `apidoc.js` from pve.proxmox.com, clones the pve-docs repo to rebuild per-endpoint version history from its full commit log, and regenerates everything under `pve/`. The PBS script fetches `apidoc.js` from pbs.proxmox.com (same format, so the same parser handles both). A [scheduled GitHub Actions workflow](.github/workflows/update-proxmox-specs.yml) does both daily and commits when upstream changed.
 
 Split per-area endpoint files (for loading a single functional area) are not committed but can be generated locally with `node tools/proxmox-api-parser/parse-pveapi.js --split`.
 
