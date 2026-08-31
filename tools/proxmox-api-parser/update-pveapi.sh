@@ -7,6 +7,13 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PVE_DIR="$REPO_ROOT/pve"
 mkdir -p "$PVE_DIR/openapi"
 
+# The registry is hand-curated and NOT regenerable; without it the OpenAPI
+# step only warns and silently emits specs missing all format validation
+if [ ! -f "$PVE_DIR/format-registry.json" ]; then
+  echo "[update-pveapi] FATAL: $PVE_DIR/format-registry.json is missing (curated file, must be committed)" >&2
+  exit 1
+fi
+
 # Build version history (clones pve-docs repo if needed)
 echo "[update-pveapi] Building version history..."
 node "$SCRIPT_DIR/history-pveapi.js" --keep-repo
