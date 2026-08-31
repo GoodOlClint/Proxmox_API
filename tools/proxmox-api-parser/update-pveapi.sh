@@ -5,6 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PVE_DIR="$REPO_ROOT/pve"
+mkdir -p "$PVE_DIR/openapi"
 
 # Build version history (clones pve-docs repo if needed)
 echo "[update-pveapi] Building version history..."
