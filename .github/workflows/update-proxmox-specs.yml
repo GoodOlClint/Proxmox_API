@@ -1,4 +1,4 @@
-name: Update PVE API spec
+name: Update Proxmox API specs
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: update-pveapi
+  group: update-proxmox-specs
   cancel-in-progress: false
 
 permissions:
