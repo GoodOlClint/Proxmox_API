@@ -1,0 +1,47 @@
+name: Update PVE API spec
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-pveapi
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/cache@v6
+        with:
+          path: |
+            tools/pve-api-parser/.pve-docs-clone
+            tools/pve-api-parser/.pve-source-clones
+          key: pve-clones-${{ github.run_id }}
+          restore-keys: pve-clones-
+
+      # parse-pveapi.js prefers the committed apidoc.js cache; remove it so the
+      # live version is fetched from pve.proxmox.com
+      - name: Regenerate
+        run: |
+          rm -f tools/pve-api-parser/apidoc.js
+          bash tools/pve-api-parser/update-pveapi.sh
+
+      - name: Commit if changed
+        run: |
+          git add -A pve
+          if git diff --cached --quiet; then
+            echo "No upstream changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Regenerate spec from upstream $(date -u +%F)"
+          git push
