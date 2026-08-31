@@ -12,7 +12,7 @@
  *   node format-history-pveapi.js [--output <path>] [--keep-repos] [--clones-dir <path>]
  *
  * Options:
- *   --output <path>       Output file (default: tools/pve-api-parser/format-history.json)
+ *   --output <path>       Output file (default: tools/proxmox-api-parser/format-history.json)
  *   --keep-repos          Don't delete cloned repos when done
  *   --clones-dir <path>   Directory for repo clones (default: .pve-source-clones)
  */

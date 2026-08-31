@@ -1,11 +1,13 @@
 # caches and regenerable intermediates — update-pveapi.sh rebuilds all of these
-tools/pve-api-parser/.pve-docs-clone/
-tools/pve-api-parser/.pve-source-clones/
-tools/pve-api-parser/apidoc.js
-tools/pve-api-parser/endpoint-history.json
-tools/pve-api-parser/format-history.json
-tools/pve-api-parser/pve-api*.json
-tools/pve-api-parser/pve-openapi*.json
+tools/proxmox-api-parser/.pve-docs-clone/
+tools/proxmox-api-parser/.pve-source-clones/
+tools/proxmox-api-parser/apidoc.js
+tools/proxmox-api-parser/pbs-apidoc.js
+tools/proxmox-api-parser/pbs-endpoint-history.json
+tools/proxmox-api-parser/endpoint-history.json
+tools/proxmox-api-parser/format-history.json
+tools/proxmox-api-parser/pve-api*.json
+tools/proxmox-api-parser/pve-openapi*.json
 node_modules/
 .DS_Store
 .claude/

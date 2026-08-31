@@ -1,6 +1,6 @@
-# Proxmox VE API Specs
+# Proxmox API Specs
 
-Machine-readable specifications for the [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment) REST API, enriched with data no other spec project carries: per-endpoint version history (which PVE release introduced or changed each endpoint and parameter) and a validation-rule registry for all 124 custom PVE format types, extracted from the Perl source of 11 Proxmox repositories.
+Machine-readable specifications for the [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment) and [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server) REST APIs, enriched with data no other spec project carries: per-endpoint version history (which PVE release introduced or changed each endpoint and parameter) and a validation-rule registry for all 124 custom PVE format types, extracted from the Perl source of 11 Proxmox repositories.
 
 ## Artifacts
 
@@ -10,6 +10,8 @@ Machine-readable specifications for the [Proxmox VE](https://www.proxmox.com/en/
 | [pve/openapi/pve-openapi.pve{4-9}.json](pve/openapi/) | Per-major-version specs — only endpoints that exist in that PVE release |
 | [pve/pve-api.json](pve/pve-api.json) | Flat endpoint list with version history, permissions, and format annotations |
 | [pve/format-registry.json](pve/format-registry.json) | Validation rules (regex/enum/property-string) for every custom PVE format type, with version history |
+| [pbs/openapi/pbs-openapi.json](pbs/openapi/pbs-openapi.json) | OpenAPI 3.0.3 spec for the current PBS API |
+| [pbs/pbs-api.json](pbs/pbs-api.json) | Flat PBS endpoint list with permissions |
 
 The OpenAPI specs work with any OpenAPI 3.0 tooling: Swagger UI and Postman for browsing, AutoRest/NSwag/openapi-generator for client generation, Prism for a mock server (`prism mock pve/openapi/pve-openapi.json`).
 
@@ -30,16 +32,17 @@ Each endpoint in `pve-api.json` carries:
 ## Regenerating
 
 ```bash
-bash tools/pve-api-parser/update-pveapi.sh
+bash tools/proxmox-api-parser/update-pveapi.sh   # PVE → pve/
+bash tools/proxmox-api-parser/update-pbsapi.sh   # PBS → pbs/
 ```
 
-This fetches the live `apidoc.js` from pve.proxmox.com, clones the pve-docs repo to rebuild per-endpoint version history from its full commit log, and regenerates everything under `pve/`. A [scheduled GitHub Actions workflow](.github/workflows/update-pveapi.yml) does the same daily and commits when upstream changed.
+The PVE script fetches the live `apidoc.js` from pve.proxmox.com, clones the pve-docs repo to rebuild per-endpoint version history from its full commit log, and regenerates everything under `pve/`. The PBS script fetches `apidoc.js` from pbs.proxmox.com (same format, so the same parser handles both). A [scheduled GitHub Actions workflow](.github/workflows/update-pveapi.yml) does both daily and commits when upstream changed.
 
-Split per-area endpoint files (for loading a single functional area) are not committed but can be generated locally with `node tools/pve-api-parser/parse-pveapi.js --split`.
+Split per-area endpoint files (for loading a single functional area) are not committed but can be generated locally with `node tools/proxmox-api-parser/parse-pveapi.js --split`.
 
 ## Roadmap
 
-- Proxmox Backup Server specs (same `apidoc.js` format; will live under `pbs/`)
+- PBS version history and format registry (PBS is Rust; the Perl-extraction pipeline doesn't apply)
 - Proxmox Datacenter Manager, once its API stabilizes
 
 ## License and provenance

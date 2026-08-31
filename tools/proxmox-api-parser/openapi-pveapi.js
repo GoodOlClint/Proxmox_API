@@ -44,6 +44,16 @@ const compact = hasFlag('--compact');
 const targetVersion = getArg('--version') ? parseInt(getArg('--version'), 10) : null;
 const allVersions = hasFlag('--all-versions');
 
+const PRODUCTS = {
+  pve: { title: 'Proxmox VE API', name: 'Proxmox Virtual Environment', abbr: 'PVE', port: '8006', cookie: 'PVEAuthCookie', tokenPrefix: 'PVEAPIToken' },
+  pbs: { title: 'Proxmox Backup Server API', name: 'Proxmox Backup Server', abbr: 'PBS', port: '8007', cookie: 'PBSAuthCookie', tokenPrefix: 'PBSAPIToken' },
+};
+const product = PRODUCTS[getArg('--product') || 'pve'];
+if (!product) {
+  process.stderr.write(`Unknown --product; valid: ${Object.keys(PRODUCTS).join(', ')}\n`);
+  process.exit(1);
+}
+
 function log(msg) {
   process.stderr.write(`[openapi-gen] ${msg}\n`);
 }
@@ -371,10 +381,11 @@ function generateSpec(endpoints, pveVersion) {
   const spec = {
     openapi: '3.0.3',
     info: {
-      title: `Proxmox VE API${pveVersion ? ` (PVE ${pveVersion})` : ''}`,
-      description: `Proxmox Virtual Environment REST API specification.\n\n` +
-        `Generated from the official Proxmox apidoc.js with validation rules ` +
-        `extracted from Perl source across 11 Proxmox repositories.\n\n` +
+      title: `${product.title}${pveVersion ? ` (${product.abbr} ${pveVersion})` : ''}`,
+      description: `${product.name} REST API specification.\n\n` +
+        `Generated from the official Proxmox apidoc.js` +
+        (formatRegistry ? ` with validation rules extracted from Perl source across 11 Proxmox repositories` : '') +
+        `.\n\n` +
         `This spec includes x-since-version extensions on endpoints and parameters ` +
         `to indicate when each was introduced.`,
       version: pveVersion ? `${pveVersion}.0` : (api.meta.pve_version_hint || '9.0'),
@@ -393,15 +404,15 @@ function generateSpec(endpoints, pveVersion) {
     servers: [
       {
         url: 'https://{host}:{port}/api2/json',
-        description: 'Proxmox VE API server',
+        description: `${product.name} API server`,
         variables: {
           host: {
             default: 'localhost',
-            description: 'PVE host address',
+            description: `${product.abbr} host address`,
           },
           port: {
-            default: '8006',
-            description: 'PVE API port',
+            default: product.port,
+            description: `${product.abbr} API port`,
           },
         },
       },
@@ -417,12 +428,12 @@ function generateSpec(endpoints, pveVersion) {
           type: 'apiKey',
           in: 'header',
           name: 'Authorization',
-          description: 'PVE API token in format: PVEAPIToken=USER@REALM!TOKENID=SECRET',
+          description: `${product.abbr} API token in format: ${product.tokenPrefix}=USER@REALM!TOKENID=SECRET`,
         },
         cookie: {
           type: 'apiKey',
           in: 'cookie',
-          name: 'PVEAuthCookie',
+          name: product.cookie,
           description: 'PVE authentication cookie obtained via POST /access/ticket',
         },
       },
@@ -487,11 +498,11 @@ function generateSpec(endpoints, pveVersion) {
       tags: [ep.functional_area],
       summary: ep.description || `${ep.method} ${ep.path}`,
       operationId: buildOperationId(ep),
-      'x-since-version': ep.since_version || null,
-      'x-since-date': ep.since_date || null,
-      'x-since-pve-major': ep.since_pve_major || null,
       'x-functional-area': ep.functional_area,
     };
+    if (ep.since_version) operation['x-since-version'] = ep.since_version;
+    if (ep.since_date) operation['x-since-date'] = ep.since_date;
+    if (ep.since_pve_major) operation['x-since-pve-major'] = ep.since_pve_major;
 
     if (ep.deprecated) {
       operation.deprecated = true;

@@ -15,7 +15,7 @@
  *
  * Options:
  *   --repo <path>      Path to an existing pve-docs clone (skips cloning)
- *   --output <path>    Output file (default: tools/pve-api-parser/endpoint-history.json)
+ *   --output <path>    Output file (default: tools/proxmox-api-parser/endpoint-history.json)
  *   --keep-repo        Don't delete the cloned repo when done
  */
 
