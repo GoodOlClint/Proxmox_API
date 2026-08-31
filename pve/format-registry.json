@@ -1,1 +1,2536 @@
-__REGISTRY_PLACEHOLDER__
+{
+  "meta": {
+    "generated_at": "2026-03-26T18:00:00Z",
+    "description": "Validation rules for PVE custom format types, extracted from Proxmox Perl source",
+    "total_formats": 123,
+    "source_repos": [
+      {
+        "name": "pve-common",
+        "url": "https://github.com/proxmox/pve-common",
+        "files": [
+          "src/PVE/JSONSchema.pm",
+          "src/PVE/Tools.pm",
+          "src/PVE/Certificate.pm",
+          "src/PVE/CalendarEvent.pm"
+        ]
+      },
+      {
+        "name": "pve-access-control",
+        "url": "https://github.com/proxmox/pve-access-control",
+        "files": [
+          "src/PVE/AccessControl.pm"
+        ]
+      },
+      {
+        "name": "pve-storage",
+        "url": "https://github.com/proxmox/pve-storage",
+        "files": [
+          "src/PVE/Storage/Plugin.pm"
+        ]
+      },
+      {
+        "name": "qemu-server",
+        "url": "https://github.com/proxmox/qemu-server",
+        "files": [
+          "src/PVE/QemuServer.pm",
+          "src/PVE/QemuServer/Drive.pm",
+          "src/PVE/QemuServer/PCI.pm",
+          "src/PVE/QemuServer/USB.pm",
+          "src/PVE/QemuServer/CPUConfig.pm",
+          "src/PVE/QemuServer/Network.pm"
+        ]
+      },
+      {
+        "name": "pve-firewall",
+        "url": "https://github.com/proxmox/pve-firewall",
+        "files": [
+          "src/PVE/Firewall.pm"
+        ]
+      },
+      {
+        "name": "pve-manager",
+        "url": "https://github.com/proxmox/pve-manager",
+        "files": [
+          "PVE/API2/Nodes.pm",
+          "PVE/API2/Backup.pm",
+          "PVE/NodeConfig.pm"
+        ]
+      },
+      {
+        "name": "pve-container",
+        "url": "https://github.com/proxmox/pve-container",
+        "files": [
+          "src/PVE/LXC/Config.pm"
+        ]
+      },
+      {
+        "name": "pve-network",
+        "url": "https://github.com/proxmox/pve-network",
+        "files": [
+          "src/PVE/Network/SDN/VnetPlugin.pm",
+          "src/PVE/Network/SDN/Zones/Plugin.pm",
+          "src/PVE/Network/SDN/Controllers/Plugin.pm",
+          "src/PVE/Network/SDN/Fabrics.pm",
+          "src/PVE/Network/SDN/Dns/Plugin.pm",
+          "src/PVE/Network/SDN/Ipams/Plugin.pm",
+          "src/PVE/Network/SDN/SubnetPlugin.pm",
+          "src/PVE/Network/SDN/Zones/EvpnPlugin.pm",
+          "src/PVE/Network/SDN/Controllers/IsisPlugin.pm"
+        ]
+      },
+      {
+        "name": "pve-ha-manager",
+        "url": "https://github.com/proxmox/pve-ha-manager",
+        "files": [
+          "src/PVE/HA/Tools.pm"
+        ]
+      },
+      {
+        "name": "pve-guest-common",
+        "url": "https://github.com/proxmox/pve-guest-common",
+        "files": [
+          "src/PVE/VZDump/Common.pm",
+          "src/PVE/ReplicationConfig.pm"
+        ]
+      },
+      {
+        "name": "pve-cluster",
+        "url": "https://github.com/proxmox/pve-cluster",
+        "files": [
+          "src/PVE/DataCenterConfig.pm"
+        ]
+      }
+    ],
+    "notes": [
+      "Format names ending in -list are handled automatically by PVE::JSONSchema — the input is split by commas and each element is validated against the base format.",
+      "Format names ending in -opt are also handled automatically — they accept empty string in addition to the base format.",
+      "Some formats like pve-fw-protocol-spec and pve-fw-sport-spec depend on system files (/etc/protocols, /etc/services) making them host-dependent.",
+      "The pve-storage-content enum varies by storage plugin type."
+    ],
+    "history_generated_at": "2026-03-26T18:29:23.264Z",
+    "history_repos_scanned": 11
+  },
+  "formats": {
+    "pve-node": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?)$",
+      "description": "PVE node hostname",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 5,
+      "last_changed_version": "9.1",
+      "last_changed_date": "2026-01-21"
+    },
+    "pve-vmid": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "integer",
+      "validation": "pattern",
+      "pattern": "^[1-9][0-9]{2,8}$",
+      "minimum": 100,
+      "maximum": 999999999,
+      "description": "VM/CT ID (100-999999999)",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 7,
+      "last_changed_version": "9.1",
+      "last_changed_date": "2026-01-21"
+    },
+    "pve-configid": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]+$",
+      "description": "Configuration identifier",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 8,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-storage-id": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_\\.]*[a-zA-Z0-9]$",
+      "min_length": 2,
+      "description": "Storage identifier",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 9,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-bridge-id": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[-_.\\w\\d]+$",
+      "description": "Network bridge identifier",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-11-05",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-iface": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]{1,20}([:.]\\d+)?$",
+      "min_length": 2,
+      "max_length": 20,
+      "description": "Network interface name",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 6,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-tag": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z0-9_][a-zA-Z0-9_\\-+.]*$",
+      "description": "Resource tag",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2019-10-03",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "mac-addr": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-fA-F0-9][02468aAcCeE](?::[a-fA-F0-9]{2}){5}$",
+      "description": "Unicast MAC address (second nibble must be even)",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2019-01-22",
+      "change_count": 9,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-vlan-id-or-range": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^(\\d+)(?:-(\\d+))?$",
+      "minimum": 2,
+      "maximum": 4094,
+      "description": "VLAN tag or range (2-4094)",
+      "since_version": "8.2",
+      "since_pve_major": 8,
+      "since_date": "2024-10-02",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "ipv4": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^(?:(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])\\.){3}(?:25[0-5]|(?:2[0-4]|1[0-9]|[1-9])?[0-9])$",
+      "description": "IPv4 address",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 6,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "ipv6": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern_note": "Full RFC-compliant IPv6 regex from PVE::Tools — too complex for a single pattern string, use dedicated validator",
+      "description": "IPv6 address",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-04-23",
+      "change_count": 5,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "ip": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "ipv4",
+        "ipv6"
+      ],
+      "description": "IPv4 or IPv6 address",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-04-23",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "ipv4mask": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "0.0.0.0",
+        "128.0.0.0",
+        "192.0.0.0",
+        "224.0.0.0",
+        "240.0.0.0",
+        "248.0.0.0",
+        "252.0.0.0",
+        "254.0.0.0",
+        "255.0.0.0",
+        "255.128.0.0",
+        "255.192.0.0",
+        "255.224.0.0",
+        "255.240.0.0",
+        "255.248.0.0",
+        "255.252.0.0",
+        "255.254.0.0",
+        "255.255.0.0",
+        "255.255.128.0",
+        "255.255.192.0",
+        "255.255.224.0",
+        "255.255.240.0",
+        "255.255.248.0",
+        "255.255.252.0",
+        "255.255.254.0",
+        "255.255.255.0",
+        "255.255.255.128",
+        "255.255.255.192",
+        "255.255.255.224",
+        "255.255.255.240",
+        "255.255.255.248",
+        "255.255.255.252",
+        "255.255.255.254",
+        "255.255.255.255"
+      ],
+      "description": "IPv4 dotted-decimal netmask",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "CIDRv4": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern_note": "IPv4 address followed by /8 through /32",
+      "description": "IPv4 CIDR notation",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-09-21",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "CIDRv6": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern_note": "IPv6 address followed by /8 through /128",
+      "description": "IPv6 CIDR notation",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-09-21",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "CIDR": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "CIDRv4",
+        "CIDRv6"
+      ],
+      "description": "IPv4 or IPv6 CIDR notation",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-ipv4-config": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "CIDRv4"
+      ],
+      "also_accepts": [
+        "dhcp",
+        "manual"
+      ],
+      "description": "IPv4 config: CIDR, 'dhcp', or 'manual'",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-09-21",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-ipv6-config": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "CIDRv6"
+      ],
+      "also_accepts": [
+        "auto",
+        "dhcp",
+        "manual"
+      ],
+      "description": "IPv6 config: CIDR, 'auto', 'dhcp', or 'manual'",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-09-21",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "address": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "ip",
+        "dns-name"
+      ],
+      "description": "IP address or DNS hostname",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-05-27",
+      "change_count": 5,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "dns-name": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?\\.)*[a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?$",
+      "description": "DNS hostname",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 6,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "email": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[\\w+\\-~]+(\\.[\\w+\\-~]+)*@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*$",
+      "description": "Email address",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 5,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "email-or-username": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "email"
+      ],
+      "also_accepts_pattern": "^[\\w+\\-~]+(\\.[\\w+\\-~]+)*$",
+      "description": "Email address or username",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-02-15",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "email-opt": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^$|^[\\w+\\-~]+(\\.[\\w+\\-~]+)*@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*$",
+      "description": "Optional email address",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-08-20",
+      "change_count": 1,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "urlencoded": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[-%a-zA-Z0-9_.!~*'()]*$",
+      "description": "URL-encoded string",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2016-03-18",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "string": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "none",
+      "description": "Any string (no-op validator)",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-02-27",
+      "change_count": 10,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "disk-size": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Integer with optional size suffix: K, KiB, M, MiB, G, GiB, T, TiB",
+      "description": "Disk size with optional unit suffix",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-10-01",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-startup-order": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "order": {
+          "type": "integer",
+          "optional": true
+        },
+        "up": {
+          "type": "integer",
+          "optional": true
+        },
+        "down": {
+          "type": "integer",
+          "optional": true
+        }
+      },
+      "description": "Startup order config: order=N,up=N,down=N",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-04-22",
+      "change_count": 5,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-tfa-secret": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern_note": "v2-0x[0-9a-fA-F]{16,128} OR v2-[A-Z2-7=]{16,128} OR legacy [A-Z2-7=]{16} or [A-Fa-f0-9]{40}",
+      "description": "TFA secret (hex or base32)",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2019-10-28",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-task-status-type": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "ok",
+        "error",
+        "warning",
+        "unknown"
+      ],
+      "case_insensitive": true,
+      "description": "Task status type",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-06-24",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-output-format": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "text",
+        "json",
+        "json-pretty",
+        "yaml"
+      ],
+      "description": "API output format",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2017-06-22",
+      "change_count": 1,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "timezone": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "system_file",
+      "source": "/usr/share/zoneinfo/zone.tab",
+      "description": "IANA timezone (validated against system zoneinfo)",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2020-06-17",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "storage-pair": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "id_map",
+      "id_format": "pve-storage-id",
+      "accepts": "source:target mapping, '1' for identity, or default target",
+      "description": "Storage ID mapping (source:target)",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-11-05",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "bridge-pair": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "id_map",
+      "id_format": "pve-bridge-id",
+      "accepts": "source:target mapping, '1' for identity, or default target",
+      "description": "Bridge ID mapping (source:target)",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-11-05",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "ldap-simple-attr": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z0-9]+$",
+      "description": "Simple LDAP attribute name",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2020-03-06",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "bwlimit": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "default": {
+          "type": "number",
+          "minimum": 0,
+          "optional": true,
+          "description": "Default bandwidth limit in KiB/s"
+        },
+        "restore": {
+          "type": "number",
+          "minimum": 0,
+          "optional": true,
+          "description": "Restore bandwidth limit in KiB/s"
+        },
+        "migration": {
+          "type": "number",
+          "minimum": 0,
+          "optional": true,
+          "description": "Migration bandwidth limit in KiB/s"
+        },
+        "clone": {
+          "type": "number",
+          "minimum": 0,
+          "optional": true,
+          "description": "Clone bandwidth limit in KiB/s"
+        },
+        "move": {
+          "type": "number",
+          "minimum": 0,
+          "optional": true,
+          "description": "Move bandwidth limit in KiB/s"
+        }
+      },
+      "description": "Bandwidth limits for various operations",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2018-01-30",
+      "change_count": 5,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "proxmox-remote": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "host": {
+          "type": "string",
+          "optional": false,
+          "description": "Remote Proxmox hostname or IP"
+        },
+        "port": {
+          "type": "integer",
+          "optional": true,
+          "description": "Port to connect to"
+        },
+        "apitoken": {
+          "type": "string",
+          "optional": false,
+          "description": "Full PVE API token including secret"
+        },
+        "fingerprint": {
+          "type": "string",
+          "optional": true,
+          "pattern": "([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}",
+          "description": "Certificate fingerprint"
+        }
+      },
+      "description": "Remote Proxmox connection string",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-11-05",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "acme-plugin-id": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/JSONSchema.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_\\.]*[a-zA-Z0-9]$",
+      "min_length": 2,
+      "description": "ACME plugin identifier",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2020-03-31",
+      "change_count": 5,
+      "last_changed_version": "9.1",
+      "last_changed_date": "2026-01-21"
+    },
+    "pve-priv": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "Datastore.Allocate",
+        "Datastore.AllocateSpace",
+        "Datastore.AllocateTemplate",
+        "Datastore.Audit",
+        "Group.Allocate",
+        "Mapping.Audit",
+        "Mapping.Modify",
+        "Mapping.Use",
+        "Permissions.Modify",
+        "Pool.Allocate",
+        "Pool.Audit",
+        "Realm.Allocate",
+        "Realm.AllocateUser",
+        "SDN.Allocate",
+        "SDN.Audit",
+        "SDN.Use",
+        "Sys.AccessNetwork",
+        "Sys.Audit",
+        "Sys.Console",
+        "Sys.Incoming",
+        "Sys.Modify",
+        "Sys.PowerMgmt",
+        "Sys.Syslog",
+        "User.Modify",
+        "VM.Allocate",
+        "VM.Audit",
+        "VM.Backup",
+        "VM.Clone",
+        "VM.Config.CDROM",
+        "VM.Config.Cloudinit",
+        "VM.Config.CPU",
+        "VM.Config.Disk",
+        "VM.Config.HWType",
+        "VM.Config.Memory",
+        "VM.Config.Network",
+        "VM.Config.Options",
+        "VM.Console",
+        "VM.GuestAgent.Audit",
+        "VM.GuestAgent.FileRead",
+        "VM.GuestAgent.FileSystemMgmt",
+        "VM.GuestAgent.FileWrite",
+        "VM.GuestAgent.Unrestricted",
+        "VM.Migrate",
+        "VM.PowerMgmt",
+        "VM.Replicate",
+        "VM.Snapshot",
+        "VM.Snapshot.Rollback"
+      ],
+      "case_sensitive": true,
+      "description": "PVE privilege name (case-sensitive, validated by hash lookup). VM.Monitor was removed in PVE 9.0.",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 10,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-07-18"
+    },
+    "pve-userid": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[^\\s@]+@[a-zA-Z0-9\\-\\.]+$",
+      "pattern_note": "username@realm format, validated by verify_username in AccessControl.pm",
+      "description": "PVE user ID (user@realm)",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-realm": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/Auth/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[A-Za-z][A-Za-z0-9.\\-_]+$",
+      "description": "Authentication realm name",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-12-05"
+    },
+    "pve-roleid": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[A-Za-z][A-Za-z0-9.\\-_]+$",
+      "description": "Role identifier",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 8,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-12-05"
+    },
+    "pve-groupid": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern_note": "Validated by verify_groupname — alphanumeric with hyphens/underscores",
+      "description": "Group identifier",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 11,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-12-05"
+    },
+    "pve-tokenid": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern_note": "Validated by verify_tokenname — alphanumeric identifier",
+      "description": "API token identifier",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-tfa-config": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "property_string",
+      "description": "TFA configuration string",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "realm-sync-options": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "property_string",
+      "description": "Realm sync options string",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-volume-id": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_\\.]*[a-zA-Z0-9]:.+$",
+      "description": "Storage volume ID (storageid:volname)",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-storage-path": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^/[^;()]+$",
+      "description": "Absolute path (no semicolons or parens)",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-07-21"
+    },
+    "pve-storage-server": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "ip",
+        "dns-name"
+      ],
+      "description": "Storage server address (IP or hostname)",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-07-21"
+    },
+    "pve-storage-vgname": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\-_\\.]*[a-zA-Z0-9]$",
+      "description": "LVM volume group name",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-storage-portal-dns": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "host:port parsed by PVE::Tools::parse_host_and_port",
+      "description": "Storage portal address (host:port)",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-storage-content": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "images",
+        "rootdir",
+        "vztmpl",
+        "backup",
+        "iso",
+        "snippets",
+        "import"
+      ],
+      "note": "Exact set depends on storage plugin type; these are the superset across all plugins",
+      "description": "Storage content type",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-storage-format": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "raw",
+        "qcow2",
+        "vmdk",
+        "subvol"
+      ],
+      "description": "Storage disk format",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-storage-options": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^\\S+$",
+      "description": "Storage mount options (non-whitespace)",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-dir-override": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^([a-z]+)=([^.]*(?:\\.?[^.]+)+)$",
+      "description": "Directory content type override (content_type=path)",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "prune-backups": {
+      "source_repo": "pve-storage",
+      "source_file": "src/PVE/Storage/Plugin.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "keep-all": {
+          "type": "boolean",
+          "optional": true
+        },
+        "keep-last": {
+          "type": "integer",
+          "minimum": 1,
+          "optional": true
+        },
+        "keep-hourly": {
+          "type": "integer",
+          "minimum": 1,
+          "optional": true
+        },
+        "keep-daily": {
+          "type": "integer",
+          "minimum": 1,
+          "optional": true
+        },
+        "keep-weekly": {
+          "type": "integer",
+          "minimum": 1,
+          "optional": true
+        },
+        "keep-monthly": {
+          "type": "integer",
+          "minimum": 1,
+          "optional": true
+        },
+        "keep-yearly": {
+          "type": "integer",
+          "minimum": 1,
+          "optional": true
+        }
+      },
+      "constraint": "keep-all cannot be combined with other keep-* options",
+      "description": "Backup pruning schedule",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-05-24",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-11"
+    },
+    "pve-hotplug-features": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "enum_list",
+      "enum": [
+        "network",
+        "disk",
+        "cpu",
+        "memory",
+        "usb",
+        "cloudinit"
+      ],
+      "special_values": {
+        "0": "disabled",
+        "1": "defaults to network,disk,usb"
+      },
+      "description": "Hotplug feature flags",
+      "since_version": "3.3",
+      "since_pve_major": 3,
+      "since_date": "2015-01-27",
+      "change_count": 10,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-cpuset": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Comma-separated CPU IDs and ranges, e.g. '0,5,8-11'",
+      "description": "CPU affinity set",
+      "since_version": "7.2",
+      "since_pve_major": 7,
+      "since_date": "2022-06-30",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-25"
+    },
+    "pve-qm-watchdog": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": [
+            "i6300esb",
+            "ib700"
+          ],
+          "default": "i6300esb",
+          "optional": true
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "reset",
+            "shutdown",
+            "poweroff",
+            "pause",
+            "debug",
+            "none"
+          ],
+          "optional": true
+        }
+      },
+      "description": "QEMU watchdog device config",
+      "since_version": "2.0",
+      "since_pve_major": 2,
+      "since_date": "2011-09-08",
+      "change_count": 15,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-09-09"
+    },
+    "pve-qm-smbios1": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "pattern": "[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}",
+          "optional": true
+        },
+        "version": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9+/]+={0,2}",
+          "optional": true
+        },
+        "serial": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9+/]+={0,2}",
+          "optional": true
+        },
+        "manufacturer": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9+/]+={0,2}",
+          "optional": true
+        },
+        "product": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9+/]+={0,2}",
+          "optional": true
+        },
+        "sku": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9+/]+={0,2}",
+          "optional": true
+        },
+        "family": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9+/]+={0,2}",
+          "optional": true
+        },
+        "base64": {
+          "type": "boolean",
+          "optional": true
+        }
+      },
+      "description": "SMBIOS type 1 fields",
+      "since_version": "3.1",
+      "since_pve_major": 3,
+      "since_date": "2014-06-26",
+      "change_count": 12,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-09-09"
+    },
+    "pve-qm-cicustom": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "meta": {
+          "type": "string",
+          "format": "pve-volume-id",
+          "optional": true
+        },
+        "network": {
+          "type": "string",
+          "format": "pve-volume-id",
+          "optional": true
+        },
+        "user": {
+          "type": "string",
+          "format": "pve-volume-id",
+          "optional": true
+        },
+        "vendor": {
+          "type": "string",
+          "format": "pve-volume-id",
+          "optional": true
+        }
+      },
+      "description": "Cloud-init custom file references",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2019-02-07",
+      "change_count": 5,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-volume-id-or-qm-path": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "union",
+      "also_accepts": [
+        "none",
+        "cdrom"
+      ],
+      "union_of": [
+        "pve-volume-id"
+      ],
+      "also_accepts_pattern": "^/.+$",
+      "description": "Volume ID, absolute path, 'none', or 'cdrom'",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2016-04-21",
+      "change_count": 9,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-25"
+    },
+    "pve-volume-id-or-absolute-path": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "pve-volume-id"
+      ],
+      "also_accepts_pattern": "^/.+$",
+      "description": "Volume ID or absolute path",
+      "since_version": "7.1",
+      "since_pve_major": 7,
+      "since_date": "2022-03-09",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-qm-boot": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "legacy": {
+          "type": "string",
+          "pattern": "[acdn]{1,4}",
+          "default": "cdn",
+          "optional": true
+        },
+        "order": {
+          "type": "string",
+          "format": "pve-qm-bootdev-list",
+          "optional": true
+        }
+      },
+      "description": "VM boot order config",
+      "since_version": "6.2",
+      "since_pve_major": 6,
+      "since_date": "2020-10-06",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-qm-bootdev": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Valid drive names (ide*, scsi*, sata*, virtio*), net*, usb*, hostpci* — rejects efidisk, tpmstate",
+      "description": "Valid QEMU boot device name",
+      "since_version": "6.2",
+      "since_pve_major": 6,
+      "since_date": "2020-10-06",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-qm-ide": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "property_string",
+      "note": "Composite format: drivedesc_base + model_fmt + ssd_fmt + wwn_fmt. See Drive.pm for full property list.",
+      "description": "IDE drive configuration",
+      "since_version": "1.0",
+      "since_pve_major": null,
+      "since_date": "2012-04-12",
+      "change_count": 10,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-scsi": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "property_string",
+      "note": "Composite: drivedesc_base + iothread + product + queues + readonly + scsiblock + ssd + vendor + wwn",
+      "description": "SCSI drive configuration",
+      "since_version": "1.0",
+      "since_pve_major": null,
+      "since_date": "2012-04-12",
+      "change_count": 10,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-sata": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "property_string",
+      "note": "Composite: drivedesc_base + ssd + wwn",
+      "description": "SATA drive configuration",
+      "since_version": "1.0",
+      "since_pve_major": null,
+      "since_date": "2012-04-12",
+      "change_count": 10,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-virtio": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "property_string",
+      "note": "Composite: drivedesc_base + iothread + readonly",
+      "description": "VirtIO drive configuration",
+      "since_version": "1.0",
+      "since_pve_major": null,
+      "since_date": "2012-04-12",
+      "change_count": 10,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-efidisk": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "file": {
+          "type": "string",
+          "format": "pve-volume-id-or-qm-path"
+        },
+        "format": {
+          "type": "string",
+          "format": "pve-qm-image-format",
+          "optional": true
+        },
+        "size": {
+          "type": "string",
+          "format": "disk-size",
+          "optional": true
+        },
+        "efitype": {
+          "type": "string",
+          "enum": [
+            "2m",
+            "4m"
+          ],
+          "optional": true
+        },
+        "pre-enrolled-keys": {
+          "type": "boolean",
+          "optional": true
+        },
+        "ms-cert": {
+          "type": "boolean",
+          "optional": true
+        }
+      },
+      "description": "EFI disk configuration",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2016-01-14",
+      "change_count": 5,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-bootdisk": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Valid QEMU drive name (ide0-3, scsi0-30, sata0-5, virtio0-15)",
+      "description": "Boot disk drive name",
+      "since_version": "2.0",
+      "since_pve_major": 2,
+      "since_date": "2011-08-23",
+      "change_count": 20,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-qm-image-format": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Drive.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "raw",
+        "qcow",
+        "qed",
+        "qcow2",
+        "vmdk",
+        "cloop"
+      ],
+      "description": "QEMU disk image format",
+      "since_version": "1.0",
+      "since_pve_major": null,
+      "since_date": "2012-04-12",
+      "change_count": 3,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-hostpci": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/PCI.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "host": {
+          "type": "string",
+          "pattern": "(?:[a-f0-9]{4,}:)?[a-f0-9]{2}:[a-f0-9]{2}(?:\\.[a-f0-9])?(;(?:[a-f0-9]{4,}:)?[a-f0-9]{2}:[a-f0-9]{2}(?:\\.[a-f0-9])?)*",
+          "optional": true
+        },
+        "mapping": {
+          "type": "string",
+          "format": "pve-configid",
+          "optional": true
+        },
+        "rombar": {
+          "type": "boolean",
+          "default": true,
+          "optional": true
+        },
+        "romfile": {
+          "type": "string",
+          "pattern": "[^,;]+",
+          "optional": true
+        },
+        "pcie": {
+          "type": "boolean",
+          "default": false,
+          "optional": true
+        },
+        "x-vga": {
+          "type": "boolean",
+          "default": false,
+          "optional": true
+        },
+        "legacy-igd": {
+          "type": "boolean",
+          "default": false,
+          "optional": true
+        },
+        "mdev": {
+          "type": "string",
+          "pattern": "[^/.:]+",
+          "optional": true
+        },
+        "vendor-id": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{4}$",
+          "optional": true
+        },
+        "device-id": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{4}$",
+          "optional": true
+        },
+        "sub-vendor-id": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{4}$",
+          "optional": true
+        },
+        "sub-device-id": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{4}$",
+          "optional": true
+        },
+        "driver": {
+          "type": "string",
+          "enum": [
+            "vfio",
+            "keep"
+          ],
+          "default": "vfio",
+          "optional": true
+        }
+      },
+      "description": "PCI device passthrough configuration",
+      "since_version": "2.0",
+      "since_pve_major": 2,
+      "since_date": "2011-08-23",
+      "change_count": 17,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-10-23"
+    },
+    "pve-qm-usb": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/USB.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "host": {
+          "type": "string",
+          "pattern_note": "vendor:product hex (0x1234:0x5678), bus-port (1-2.3), or 'spice'",
+          "optional": true
+        },
+        "mapping": {
+          "type": "string",
+          "format": "pve-configid",
+          "optional": true
+        },
+        "usb3": {
+          "type": "boolean",
+          "default": false,
+          "optional": true
+        }
+      },
+      "description": "USB device passthrough configuration",
+      "since_version": "8.0",
+      "since_pve_major": 8,
+      "since_date": "2023-06-16",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-vm-cpu-conf": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/CPUConfig.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "cputype": {
+          "type": "string",
+          "description": "CPU model name — validated against built-in and custom models"
+        },
+        "flags": {
+          "type": "string",
+          "pattern_note": "Semicolon-separated [+-]flagname tokens",
+          "optional": true
+        }
+      },
+      "note": "cputype validated against known CPU model list; 'reported-model' property forbidden",
+      "description": "VM CPU configuration",
+      "since_version": "6.1",
+      "since_pve_major": 6,
+      "since_date": "2020-02-12",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-phys-bits": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/CPUConfig.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^(host|\\d{1,2})$",
+      "description": "Physical address bits: 'host' or integer 8-64",
+      "since_version": "6.1",
+      "since_pve_major": 6,
+      "since_date": "2020-04-07",
+      "change_count": 9,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-11-17"
+    },
+    "pve-qemu-sev-fmt": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/CPUConfig.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "std",
+            "es",
+            "snp"
+          ]
+        },
+        "no-debug": {
+          "type": "boolean",
+          "optional": true
+        },
+        "no-key-sharing": {
+          "type": "boolean",
+          "optional": true
+        },
+        "allow-smt": {
+          "type": "boolean",
+          "default": true,
+          "optional": true
+        },
+        "kernel-hashes": {
+          "type": "boolean",
+          "optional": true
+        }
+      },
+      "description": "AMD SEV confidential computing config",
+      "since_version": "8.2",
+      "since_pve_major": 8,
+      "since_date": "2024-11-18",
+      "change_count": 6,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-11-17"
+    },
+    "pve-qemu-tdx-fmt": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/CPUConfig.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "tdx"
+          ]
+        },
+        "attestation": {
+          "type": "boolean",
+          "default": true,
+          "optional": true
+        },
+        "vsock-cid": {
+          "type": "integer",
+          "minimum": 2,
+          "optional": true
+        },
+        "vsock-port": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 4050,
+          "optional": true
+        }
+      },
+      "description": "Intel TDX confidential computing config",
+      "since_version": "9.0",
+      "since_pve_major": 9,
+      "since_date": "2025-10-28",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-11-17"
+    },
+    "pve-qm-cpu-arch": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/CPUConfig.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "x86_64",
+        "aarch64"
+      ],
+      "description": "QEMU CPU architecture",
+      "since_version": "9.0",
+      "since_pve_major": 9,
+      "since_date": "2025-06-16",
+      "change_count": 0,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-qm-rng": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer.pm",
+      "type": "string",
+      "validation": "property_string",
+      "note": "RNG device configuration — see QemuServer.pm for full properties",
+      "description": "QEMU RNG device config",
+      "since_version": "6.2",
+      "since_pve_major": 6,
+      "since_date": "2020-10-16",
+      "change_count": 2,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "IPorCIDR": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "IPv4 or IPv6 address, optionally with CIDR prefix. Validated via Net::IP->new()",
+      "description": "IP address or CIDR (validated by Net::IP)",
+      "since_version": "1.0",
+      "since_pve_major": 1,
+      "since_date": "2014-10-31",
+      "change_count": 10,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "IPorCIDRorAlias": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "union",
+      "union_of": [
+        "IPorCIDR"
+      ],
+      "also_accepts_pattern": "^(dc/|guest/)?[A-Za-z][A-Za-z0-9\\-_]+$",
+      "description": "IP/CIDR or firewall alias name (optionally prefixed with dc/ or guest/)",
+      "since_version": "1.0",
+      "since_pve_major": 1,
+      "since_date": "2014-10-31",
+      "change_count": 7,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-fw-addr-spec": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "+ipsetname, aliases (dc/name, guest/name, bare name), or comma-separated IP/CIDR list. No mixed IPv4/IPv6.",
+      "description": "Firewall address specification",
+      "since_version": "1.0",
+      "since_pve_major": 1,
+      "since_date": "2014-10-30",
+      "change_count": 6,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-fw-sport-spec": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Port numbers 0-65535, ranges N:M, service names from /etc/services, comma-separated (max 15 numeric entries)",
+      "description": "Firewall source port specification",
+      "since_version": "2.0",
+      "since_pve_major": 2,
+      "since_date": "2016-03-01",
+      "change_count": 5,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-fw-dport-spec": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Same as sport-spec plus ICMP type names",
+      "description": "Firewall destination port specification",
+      "since_version": "2.0",
+      "since_pve_major": 2,
+      "since_date": "2016-03-01",
+      "change_count": 4,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-fw-protocol-spec": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "system_file",
+      "source": "/etc/protocols",
+      "description": "Protocol name or number from /etc/protocols",
+      "since_version": "1.0",
+      "since_pve_major": 1,
+      "since_date": "2014-03-25",
+      "change_count": 5,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-fw-icmp-type-spec": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum_icmpv4": [
+        "any",
+        "echo-reply",
+        "destination-unreachable",
+        "source-quench",
+        "redirect",
+        "echo-request",
+        "router-advertisement",
+        "router-solicitation",
+        "time-exceeded",
+        "parameter-problem",
+        "timestamp-request",
+        "timestamp-reply",
+        "info-request",
+        "info-reply",
+        "address-mask-request",
+        "address-mask-reply"
+      ],
+      "enum_icmpv6": [
+        "destination-unreachable",
+        "packet-too-big",
+        "time-exceeded",
+        "parameter-problem",
+        "echo-request",
+        "echo-reply",
+        "mld-listener-query",
+        "mld-listener-report",
+        "mld-listener-done",
+        "router-solicitation",
+        "router-advertisement",
+        "neighbor-solicitation",
+        "neighbor-advertisement",
+        "redirect",
+        "router-renumbering",
+        "mld2-listener-report"
+      ],
+      "note": "Full lists have ~32 ICMPv4 and ~24 ICMPv6 types — see Firewall.pm $icmp_type_names and $icmpv6_type_names",
+      "description": "ICMP type name",
+      "since_version": "4.1",
+      "since_pve_major": 4,
+      "since_date": "2020-05-29",
+      "change_count": 0
+    },
+    "pve-fw-loglevel": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "emerg",
+        "alert",
+        "crit",
+        "err",
+        "warning",
+        "notice",
+        "info",
+        "debug",
+        "nolog"
+      ],
+      "description": "Firewall log level",
+      "since_version": "3.1",
+      "since_pve_major": null,
+      "since_date": "2014-03-04",
+      "change_count": 2,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-fw-conntrack-helper": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "enum_list",
+      "enum": [
+        "amanda",
+        "ftp",
+        "irc",
+        "netbios-ns",
+        "pptp",
+        "sane",
+        "sip",
+        "snmp",
+        "tftp"
+      ],
+      "description": "Conntrack helper modules",
+      "since_version": "4.3",
+      "since_pve_major": 7,
+      "since_date": "2023-03-09",
+      "change_count": 1,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "ipset-name": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[A-Za-z][A-Za-z0-9\\-_]+$",
+      "min_length": 2,
+      "max_length": 64,
+      "description": "Firewall IP set name",
+      "since_version": "3.1",
+      "since_pve_major": null,
+      "since_date": "2014-03-04",
+      "change_count": 1,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-fw-alias": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[A-Za-z][A-Za-z0-9\\-_]+$",
+      "min_length": 2,
+      "max_length": 64,
+      "description": "Firewall alias name",
+      "since_version": "3.1",
+      "since_pve_major": null,
+      "since_date": "2014-03-04",
+      "change_count": 1,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-security-group-name": {
+      "source_repo": "pve-firewall",
+      "source_file": "src/PVE/Firewall.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[A-Za-z][A-Za-z0-9\\-_]+$",
+      "min_length": 2,
+      "max_length": 18,
+      "description": "Firewall security group name",
+      "since_version": "3.1",
+      "since_pve_major": null,
+      "since_date": "2014-03-04",
+      "change_count": 1,
+      "history_note": "manually estimated — not registered via register_format()"
+    },
+    "pve-command-batch": {
+      "source_repo": "pve-manager",
+      "source_file": "PVE/API2/Nodes.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "JSON-encoded array of {path, method (GET|POST|PUT|DELETE), args?} objects",
+      "description": "Batch API command payload",
+      "since_version": "7.2",
+      "since_pve_major": 7,
+      "since_date": "2022-07-27",
+      "change_count": 3,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-17"
+    },
+    "pve-lxc-mp-string": {
+      "source_repo": "pve-container",
+      "source_file": "src/PVE/LXC/Config.pm",
+      "type": "string",
+      "validation": "custom",
+      "rejects_patterns": [
+        "/../",
+        "/./",
+        "/..$ at end",
+        "../ at start"
+      ],
+      "description": "LXC mount point path (rejects directory traversal)",
+      "since_version": "1.0",
+      "since_pve_major": 1,
+      "since_date": "2016-03-02",
+      "change_count": 4,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-lxc-dev-string": {
+      "source_repo": "pve-container",
+      "source_file": "src/PVE/LXC/Config.pm",
+      "type": "string",
+      "validation": "custom",
+      "requires_prefix": "/dev/",
+      "rejects_patterns": [
+        "/./",
+        "/../"
+      ],
+      "description": "LXC device path (must start with /dev/, no traversal)",
+      "since_version": "5.0",
+      "since_pve_major": 8,
+      "since_date": "2023-11-17",
+      "change_count": 2,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "lxc-ip-with-ll-iface": {
+      "source_repo": "pve-container",
+      "source_file": "src/PVE/LXC/Config.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "IPv6 link-local with interface (fe80:addr%iface) or any valid IP",
+      "pattern_note": "^(fe80:[^%]+)%(.*)$ for link-local, otherwise delegates to ip format",
+      "description": "IP address, optionally IPv6 link-local with interface identifier",
+      "since_version": "3.3",
+      "since_pve_major": 3,
+      "since_date": "2020-11-24",
+      "change_count": 1,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-ct-timezone": {
+      "source_repo": "pve-container",
+      "source_file": "src/PVE/LXC/Config.pm",
+      "type": "string",
+      "validation": "union",
+      "also_accepts": [
+        "host"
+      ],
+      "union_of": [
+        "timezone"
+      ],
+      "description": "Container timezone: 'host' or valid IANA timezone",
+      "since_version": "3.1",
+      "since_pve_major": 3,
+      "since_date": "2020-07-02",
+      "change_count": 5,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-11-24"
+    },
+    "pve-ha-resource-id": {
+      "source_repo": "pve-ha-manager",
+      "source_file": "src/PVE/HA/Tools.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-z]+:\\S+$",
+      "description": "HA resource ID (type:name, e.g. vm:100, ct:101)",
+      "since_version": "0.2",
+      "since_pve_major": 0,
+      "since_date": "2015-03-13",
+      "change_count": 5,
+      "last_changed_version": "5.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-ha-resource-or-vm-id": {
+      "source_repo": "pve-ha-manager",
+      "source_file": "src/PVE/HA/Tools.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^([a-z]+:\\S+|\\d+)$",
+      "description": "HA resource ID or bare numeric VM/CT ID",
+      "since_version": "0.9",
+      "since_pve_major": 0,
+      "since_date": "2015-04-03",
+      "change_count": 5,
+      "last_changed_version": "5.0",
+      "last_changed_date": "2025-07-30"
+    },
+    "pve-ha-node": {
+      "source_repo": "pve-ha-manager",
+      "source_file": "src/PVE/HA/Tools.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?)(:\\d+)?$",
+      "description": "Cluster node name with optional port suffix",
+      "since_version": "5.0",
+      "since_pve_major": 9,
+      "since_date": "2025-08-04",
+      "change_count": 0
+    },
+    "pve-sdn-vnet-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/VnetPlugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9]*[a-zA-Z0-9]$",
+      "max_length": 8,
+      "description": "SDN vnet identifier (max 8 chars)",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 1,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-zone-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Zones/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9]*[a-zA-Z0-9]$",
+      "max_length": 8,
+      "description": "SDN zone identifier (max 8 chars)",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 1,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-controller-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Controllers/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9]$",
+      "max_length": 64,
+      "description": "SDN controller identifier (max 64 chars)",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 2,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-fabric-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Fabrics.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{0,6}[a-zA-Z0-9]?$",
+      "max_length": 8,
+      "description": "SDN fabric identifier (1-8 chars)",
+      "since_version": "1.1",
+      "since_pve_major": 9,
+      "since_date": "2025-07-16",
+      "change_count": 0
+    },
+    "pve-sdn-dns-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Dns/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9]*[a-zA-Z0-9]$",
+      "description": "SDN DNS plugin identifier",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 2,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-ipam-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Ipams/Plugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9]*[a-zA-Z0-9]$",
+      "description": "SDN IPAM plugin identifier",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 3,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-subnet-id": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/SubnetPlugin.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "CIDR notation (contains /) or zone-ip-mask hyphen format converted to ip/mask",
+      "description": "SDN subnet identifier (CIDR notation)",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 1,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-bgp-rt": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Zones/EvpnPlugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^(\\d+):(\\d+)$",
+      "component_range": "0-4294967295",
+      "description": "BGP route target (ASN:NN format)",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-05-25",
+      "change_count": 2,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-isis-net": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/Controllers/IsisPlugin.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-fA-F0-9]{2}(\\.[a-fA-F0-9]{4}){3,9}\\.[a-fA-F0-9]{2}$",
+      "description": "IS-IS Network Entity Title (NET address)",
+      "since_version": "0.9",
+      "since_pve_major": 8,
+      "since_date": "2024-04-16",
+      "change_count": 1,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-sdn-dhcp-range": {
+      "source_repo": "pve-network",
+      "source_file": "src/PVE/Network/SDN/SubnetPlugin.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "start-address": {
+          "type": "string",
+          "format": "ip",
+          "description": "Start of DHCP range"
+        },
+        "end-address": {
+          "type": "string",
+          "format": "ip",
+          "description": "End of DHCP range"
+        }
+      },
+      "constraint": "start <= end, both within subnet CIDR, no overlapping ranges",
+      "description": "DHCP address range",
+      "since_version": "0.8",
+      "since_pve_major": 8,
+      "since_date": "2023-11-17",
+      "change_count": 2,
+      "last_changed_version": "1.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-qm-ipconfig": {
+      "source_repo": "qemu-server",
+      "source_file": "src/PVE/QemuServer/Network.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "ip": {
+          "type": "string",
+          "format": "pve-ipv4-config",
+          "default": "dhcp",
+          "optional": true
+        },
+        "gw": {
+          "type": "string",
+          "format": "ipv4",
+          "optional": true,
+          "requires": "ip"
+        },
+        "ip6": {
+          "type": "string",
+          "format": "pve-ipv6-config",
+          "default": "dhcp",
+          "optional": true
+        },
+        "gw6": {
+          "type": "string",
+          "format": "ipv6",
+          "optional": true,
+          "requires": "ip6"
+        }
+      },
+      "description": "Cloud-init IP configuration",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-06-16",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-25"
+    },
+    "backup-fleecing": {
+      "source_repo": "pve-guest-common",
+      "source_file": "src/PVE/VZDump/Common.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "optional": true
+        },
+        "storage": {
+          "type": "string",
+          "format": "pve-storage-id",
+          "optional": true
+        }
+      },
+      "constraint": "storage required when enabled is set",
+      "description": "Backup fleecing configuration",
+      "since_version": "5.1",
+      "since_pve_major": 8,
+      "since_date": "2024-04-11",
+      "change_count": 2,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "backup-performance": {
+      "source_repo": "pve-guest-common",
+      "source_file": "src/PVE/VZDump/Common.pm",
+      "type": "string",
+      "validation": "property_string",
+      "properties": {
+        "max-workers": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256,
+          "default": 16,
+          "optional": true
+        },
+        "pbs-entries-max": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1048576,
+          "optional": true
+        }
+      },
+      "description": "Backup performance tuning",
+      "since_version": "4.1",
+      "since_pve_major": 7,
+      "since_date": "2022-10-03",
+      "change_count": 5,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-calendar-event": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/CalendarEvent.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Systemd-style calendar event specification (parsed by Rust-backed CalendarEvent)",
+      "description": "Systemd calendar event for scheduling",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2017-05-17",
+      "change_count": 7,
+      "last_changed_version": "9.1",
+      "last_changed_date": "2026-01-21"
+    },
+    "pve-day-of-week": {
+      "source_repo": "pve-manager",
+      "source_file": "PVE/API2/Backup.pm",
+      "type": "string",
+      "validation": "enum",
+      "enum": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "description": "Abbreviated day of week",
+      "since_version": "2.0",
+      "since_pve_major": 2,
+      "since_date": "2011-10-25",
+      "change_count": 13,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-17"
+    },
+    "pve-poolid": {
+      "source_repo": "pve-access-control",
+      "source_file": "src/PVE/AccessControl.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[A-Za-z0-9.\\-_]+(?:/[A-Za-z0-9.\\-_]+){0,2}$",
+      "max_nesting": 3,
+      "description": "Resource pool ID (supports hierarchical pools with /)",
+      "since_version": "7.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 4,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-12-05"
+    },
+    "pve-replication-job-id": {
+      "source_repo": "pve-guest-common",
+      "source_file": "src/PVE/ReplicationConfig.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[1-9][0-9]{2,8}-\\d{1,9}$",
+      "description": "Replication job ID (GUEST-JOBNUM)",
+      "since_version": "4.0",
+      "since_pve_major": 7,
+      "since_date": "2021-05-09",
+      "change_count": 2,
+      "last_changed_version": "6.0",
+      "last_changed_date": "2025-06-16"
+    },
+    "pve-acme-domain": {
+      "source_repo": "pve-manager",
+      "source_file": "PVE/NodeConfig.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]*(\\.[a-zA-Z0-9][a-zA-Z0-9_-]*)+$",
+      "description": "Domain name for ACME certificate",
+      "since_version": "5.1",
+      "since_pve_major": 5,
+      "since_date": "2018-04-27",
+      "change_count": 8,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-17"
+    },
+    "pve-acme-alias": {
+      "source_repo": "pve-manager",
+      "source_file": "PVE/NodeConfig.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-zA-Z0-9_][a-zA-Z0-9_-]*(\\.[a-zA-Z0-9_][a-zA-Z0-9_-]*)+$",
+      "description": "DNS alias for ACME verification (allows underscore-prefixed labels)",
+      "since_version": "6.2",
+      "since_pve_major": 6,
+      "since_date": "2020-06-22",
+      "change_count": 2,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-17"
+    },
+    "mac-prefix": {
+      "source_repo": "pve-cluster",
+      "source_file": "src/PVE/DataCenterConfig.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^[a-fA-F0-9][02468aAcCeE](?::[a-fA-F0-9]{2}){0,2}(?::[a-fA-F0-9]?)?$",
+      "description": "Unicast MAC address prefix (default BC:24:11)",
+      "since_version": "6.0",
+      "since_pve_major": 6,
+      "since_date": "2019-11-11",
+      "change_count": 7,
+      "last_changed_version": "9.1",
+      "last_changed_date": "2026-02-24"
+    },
+    "graphite-path": {
+      "source_repo": "pve-manager",
+      "source_file": "PVE/Status/Graphite.pm",
+      "type": "string",
+      "validation": "pattern",
+      "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?\\.)*[a-zA-Z0-9]([a-zA-Z0-9\\-]*[a-zA-Z0-9])?$",
+      "description": "Graphite metric path (dot-separated segments)",
+      "since_version": "4.0",
+      "since_pve_major": 4,
+      "since_date": "2015-06-23",
+      "change_count": 9,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-17"
+    },
+    "pem-certificate": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/Certificate.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Single PEM-encoded certificate block",
+      "description": "PEM certificate",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2018-04-19",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pem-certificate-chain": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/Certificate.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "One or more concatenated PEM certificate blocks",
+      "description": "PEM certificate chain",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2018-04-19",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pem-string": {
+      "source_repo": "pve-common",
+      "source_file": "src/PVE/Certificate.pm",
+      "type": "string",
+      "validation": "custom",
+      "accepts": "Any PEM-encoded data (certificate, key, etc.)",
+      "description": "PEM-encoded data",
+      "since_version": "5.0",
+      "since_pve_major": 5,
+      "since_date": "2018-04-19",
+      "change_count": 1,
+      "last_changed_version": "9.0",
+      "last_changed_date": "2025-06-01"
+    },
+    "pve-storage-path-in-property-string": {
+      "source_repo": "unknown",
+      "source_file": "unknown",
+      "type": "string",
+      "validation": "custom",
+      "note": "Not found as a registered format in any Proxmox repo. May be constructed dynamically or an alias for pve-storage-path",
+      "description": "Storage path within a property string context",
+      "since_version": "unknown",
+      "since_pve_major": null,
+      "since_date": "unknown",
+      "change_count": 0,
+      "history_note": "manually estimated — not registered via register_format()"
+    }
+  }
+}
