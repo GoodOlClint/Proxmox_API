@@ -22,8 +22,8 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: |
-            tools/pve-api-parser/.pve-docs-clone
-            tools/pve-api-parser/.pve-source-clones
+            tools/proxmox-api-parser/.pve-docs-clone
+            tools/proxmox-api-parser/.pve-source-clones
           key: pve-clones-${{ github.run_id }}
           restore-keys: pve-clones-
 
@@ -31,12 +31,13 @@ jobs:
       # live version is fetched from pve.proxmox.com
       - name: Regenerate
         run: |
-          rm -f tools/pve-api-parser/apidoc.js
-          bash tools/pve-api-parser/update-pveapi.sh
+          rm -f tools/proxmox-api-parser/apidoc.js
+          bash tools/proxmox-api-parser/update-pveapi.sh
+          bash tools/proxmox-api-parser/update-pbsapi.sh
 
       - name: Commit if changed
         run: |
-          git add -A pve
+          git add -A pve pbs
           if git diff --cached --quiet; then
             echo "No upstream changes."
             exit 0

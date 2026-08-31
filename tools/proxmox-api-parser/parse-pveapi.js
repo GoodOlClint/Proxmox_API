@@ -110,7 +110,12 @@ function classifyArea(apiPath) {
       return area;
     }
   }
-  return 'other';
+  // Fallback: derive from path segments so non-PVE trees (PBS: /admin/datastore,
+  // /config/media-pool, ...) classify without product-specific rules
+  const segs = apiPath.split('/').filter(Boolean);
+  if (segs.length === 0) return 'other';
+  const seg = (['admin', 'config'].includes(segs[0]) && segs[1]) ? segs[1] : segs[0];
+  return seg.replace(/[{}]/g, '').replace(/-/g, '_');
 }
 
 // ─── Fetch helper ───────────────────────────────────────────────────────────
@@ -138,13 +143,13 @@ function fetchUrl(url) {
 function extractApiSchema(source) {
   // Strategy 1: Find the JSON array between `const apiSchema = [` and `];\n`
   // The array starts at line 1 and the closing `];` is on its own line.
-  const startMarker = 'const apiSchema = ';
-  const startIdx = source.indexOf(startMarker);
-  if (startIdx === -1) {
-    throw new Error('Could not find "const apiSchema = " in source');
+  // PVE uses `const apiSchema = `, PBS uses `var apiSchema = `
+  const markerMatch = source.match(/(?:const|var) apiSchema = /);
+  if (!markerMatch) {
+    throw new Error('Could not find "apiSchema = " in source');
   }
 
-  const jsonStart = startIdx + startMarker.length;
+  const jsonStart = markerMatch.index + markerMatch[0].length;
 
   // Find the closing `];` — scan for `\n]` followed by `;` or `\n`
   // We know the structure ends with `]\n;` (the `]` and `;` are on separate lines)
@@ -479,7 +484,7 @@ async function main() {
   const output = {
     meta: {
       generated_at: new Date().toISOString(),
-      source_url: SOURCE_URL,
+      source_url: getArg('--source-url') || (inputPath ? path.resolve(inputPath) : SOURCE_URL),
       source_sha256: sha256,
       total_endpoints: endpoints.length,
       total_paths: uniquePaths.size,
