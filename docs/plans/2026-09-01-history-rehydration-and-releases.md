@@ -1,6 +1,6 @@
 # Change plan: history rehydration and release tagging
 
-Status: Approved 2026-09-01 — in progress. Decisions: [ADR 0001](../decisions/0001-upstream-docs-version-is-the-release-identity-for-tags-and-releases.md), [ADR 0002](../decisions/0002-rewrite-main-once-with-per-version-historical-snapshots.md).
+Status: Implemented 2026-09-01 (main rewritten, 69 tags pushed); awaiting first CI run for step 5/6 validation. Decisions: [ADR 0001](../decisions/0001-upstream-docs-version-is-the-release-identity-for-tags-and-releases.md), [ADR 0002](../decisions/0002-rewrite-main-once-with-per-version-historical-snapshots.md).
 
 ## Scope
 
