@@ -52,6 +52,10 @@ Split per-area endpoint files (for loading a single functional area) are not com
 - PBS version history and format registry (PBS is Rust; the Perl-extraction pipeline doesn't apply)
 - Proxmox Datacenter Manager, once its API stabilizes
 
+## Decisions
+
+Architectural decisions are recorded in [docs/decisions/](docs/decisions/); change plans in [docs/plans/](docs/plans/).
+
 ## License and provenance
 
 This repository is licensed [AGPL-3.0-or-later](LICENSE).
