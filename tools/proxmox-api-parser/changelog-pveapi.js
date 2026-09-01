@@ -1,0 +1,146 @@
+#!/usr/bin/env node
+/**
+ * changelog-pveapi.js — Render endpoint-history.json as a per-release Markdown changelog.
+ *
+ * Usage:
+ *   node changelog-pveapi.js [--history <path>] [--api <path>] [--output <path>]
+ *
+ * Options:
+ *   --history <path>   endpoint-history.json (default: alongside this script)
+ *   --api <path>       pve-api.json, used for endpoint descriptions (optional)
+ *   --output <path>    Output file (default: pve/CHANGELOG.md)
+ */
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const args = process.argv.slice(2);
+function getArg(name) {
+  const idx = args.indexOf(name);
+  return idx === -1 ? null : args[idx + 1] || null;
+}
+
+const historyPath = getArg('--history') || path.join(__dirname, 'endpoint-history.json');
+const apiPath = getArg('--api');
+const outputPath = getArg('--output') || path.join(__dirname, '..', '..', 'pve', 'CHANGELOG.md');
+
+const history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+
+const descriptions = new Map();
+if (apiPath && fs.existsSync(apiPath)) {
+  for (const ep of JSON.parse(fs.readFileSync(apiPath, 'utf8')).endpoints) {
+    if (ep.description) descriptions.set(`${ep.method} ${ep.path}`, ep.description);
+  }
+}
+
+// ─── Group events by version ────────────────────────────────────────────────
+
+const releases = new Map(); // version → { added: [], changed: Map(key → [changes]), dates: [] }
+function release(version) {
+  if (!releases.has(version)) releases.set(version, { added: [], changed: new Map(), dates: [] });
+  return releases.get(version);
+}
+
+for (const [key, entry] of Object.entries(history.endpoints)) {
+  if (entry.introduced) {
+    const r = release(entry.introduced.since_version);
+    r.added.push(key);
+    r.dates.push(entry.introduced.since_date);
+  }
+  for (const change of entry.changes || []) {
+    const r = release(change.version);
+    if (!r.changed.has(key)) r.changed.set(key, []);
+    r.changed.get(key).push(change);
+    r.dates.push(change.date);
+  }
+}
+
+function versionSortKey(v) {
+  const parts = v.split(/[.\-+]/).map(n => parseInt(n, 10) || 0);
+  return parts[0] * 1e6 + parts[1] * 1e3 + (parts[2] || 0);
+}
+const versions = [...releases.keys()].sort((a, b) => versionSortKey(b) - versionSortKey(a));
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+
+function code(s) { return '`' + s + '`'; }
+
+function short(v) {
+  const s = JSON.stringify(v);
+  return s === undefined ? 'none' : s.length > 40 ? s.slice(0, 37) + '…' : s;
+}
+
+// Object-valued fields (property-string formats) are summarized by which keys
+// changed; dumping the full schema made single lines run to 100KB+
+function summarize(ov, nv) {
+  const isObj = x => x && typeof x === 'object' && !Array.isArray(x);
+  if (!isObj(ov) || !isObj(nv)) return `${short(ov)} → ${short(nv)}`;
+  const keys = new Set([...Object.keys(ov), ...Object.keys(nv)]);
+  const parts = [];
+  for (const k of keys) {
+    if (!(k in ov)) parts.push('+' + k);
+    else if (!(k in nv)) parts.push('-' + k);
+    else if (JSON.stringify(ov[k]) !== JSON.stringify(nv[k])) parts.push('~' + k);
+  }
+  return parts.join(' ') || 'reordered';
+}
+
+function describeChange(c) {
+  if (c.type === 'returns_changed') {
+    const o = c.old_returns || {}, n = c.new_returns || {};
+    if (o.type !== n.type) return `returns ${o.type || 'none'} → ${n.type || 'none'}`;
+    if (o.items_type !== n.items_type) return `returns items ${o.items_type || 'none'} → ${n.items_type || 'none'}`;
+    const op = new Set(o.properties || []), np = new Set(n.properties || []);
+    const delta = [...[...np].filter(k => !op.has(k)).map(k => '+' + k), ...[...op].filter(k => !np.has(k)).map(k => '-' + k)];
+    return `returns ${o.type}: ${delta.map(code).join(', ') || 'reordered'}`;
+  }
+  const bits = [];
+  if (c.added_params && c.added_params.length) bits.push('added ' + c.added_params.map(code).join(', '));
+  if (c.removed_params && c.removed_params.length) bits.push('removed ' + c.removed_params.map(code).join(', '));
+  if (c.changed_params && c.changed_params.length) {
+    bits.push('changed ' + c.changed_params.map(p => {
+      const diffs = [];
+      for (const f of new Set([...Object.keys(p.old || {}), ...Object.keys(p.new || {})])) {
+        const ov = p.old ? p.old[f] : undefined, nv = p.new ? p.new[f] : undefined;
+        if (JSON.stringify(ov) !== JSON.stringify(nv)) diffs.push(`${f}: ${summarize(ov, nv)}`);
+      }
+      return code(p.name) + (diffs.length ? ` (${diffs.join('; ')})` : '');
+    }).join(', '));
+  }
+  return bits.join('; ') || c.type;
+}
+
+const out = [];
+out.push('# Proxmox VE API Changelog');
+out.push('');
+out.push(`Endpoints introduced and changed per PVE release, derived from the commit history of \`api-viewer/apidata.js\` in [pve-docs](https://github.com/proxmox/pve-docs). ${history.meta.total_endpoints_tracked} endpoints tracked across ${history.meta.total_commits_analyzed} commits; ${history.meta.total_change_events} change events. Generated by \`tools/proxmox-api-parser/changelog-pveapi.js\`.`);
+out.push('');
+
+for (const version of versions) {
+  const r = releases.get(version);
+  const latest = r.dates.filter(Boolean).sort().pop();
+  out.push(`## PVE ${version}${latest ? ` (${latest})` : ''}`);
+  out.push('');
+  if (r.added.length) {
+    out.push(`### New endpoints (${r.added.length})`);
+    out.push('');
+    for (const key of r.added.sort()) {
+      const d = descriptions.get(key);
+      out.push(`- ${code(key)}${d ? ` — ${d.split('\n')[0]}` : ''}`);
+    }
+    out.push('');
+  }
+  if (r.changed.size) {
+    out.push(`### Changed endpoints (${r.changed.size})`);
+    out.push('');
+    for (const key of [...r.changed.keys()].sort()) {
+      out.push(`- ${code(key)}: ${r.changed.get(key).map(describeChange).join('; ')}`);
+    }
+    out.push('');
+  }
+}
+
+fs.writeFileSync(outputPath, out.join('\n'), 'utf8');
+process.stderr.write(`[changelog] ${versions.length} releases → ${outputPath}\n`);

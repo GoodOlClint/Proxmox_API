@@ -3,9 +3,10 @@
  * diff-pveapi.js — Compare two pve-api.json files and report differences.
  *
  * Usage:
- *   node diff-pveapi.js --old old/pve-api.json --new new/pve-api.json
+ *   node diff-pveapi.js --old old/pve-api.json --new new/pve-api.json [--output <path>]
  *
- * Outputs a summary to stdout and writes pve-api-diff.json alongside --new.
+ * Outputs a summary to stdout and writes the full diff JSON to --output
+ * (default: pve-api-diff.json alongside --new).
  */
 
 'use strict';
@@ -24,6 +25,7 @@ function getArg(name) {
 
 const oldPath = getArg('--old');
 const newPath = getArg('--new');
+const outArg = getArg('--output');
 
 if (!oldPath || !newPath) {
   console.error('Usage: node diff-pveapi.js --old <path> --new <path>');
@@ -157,7 +159,7 @@ const diffResult = {
 };
 
 // Write diff file alongside --new
-const diffOutputPath = path.join(path.dirname(path.resolve(newPath)), 'pve-api-diff.json');
+const diffOutputPath = outArg ? path.resolve(outArg) : path.join(path.dirname(path.resolve(newPath)), 'pve-api-diff.json');
 fs.writeFileSync(diffOutputPath, JSON.stringify(diffResult, null, 2), 'utf8');
 
 // Print summary
