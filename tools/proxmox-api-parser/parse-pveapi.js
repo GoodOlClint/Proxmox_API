@@ -145,8 +145,8 @@ function fetchUrl(url) {
 function extractApiSchema(source) {
   // Strategy 1: Find the JSON array between `const apiSchema = [` and `];\n`
   // The array starts at line 1 and the closing `];` is on its own line.
-  // PVE uses `const apiSchema = `, PBS uses `var apiSchema = `
-  const markerMatch = source.match(/(?:const|var) apiSchema = /);
+  // PVE uses `const apiSchema = `, PBS `var apiSchema = `, pve-docs before 2019 `var pveapi = `
+  const markerMatch = source.match(/(?:const|var|let)\s+(?:apiSchema|pveapi)\s*=\s*/);
   if (!markerMatch) {
     throw new Error('Could not find "apiSchema = " in source');
   }

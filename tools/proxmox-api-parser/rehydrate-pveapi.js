@@ -47,8 +47,8 @@ function sh(cmd, opts = {}) {
   return execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024, ...opts }).trim();
 }
 function versionKey(v) {
-  const p = v.split('.').map((n) => parseInt(n, 10) || 0);
-  return p[0] * 1e6 + p[1] * 1e3 + (p[2] || 0);
+  const p = v.split(/[.\-]/).map((n) => parseInt(n, 10) || 0);
+  return p[0] * 1e9 + p[1] * 1e6 + (p[2] || 0) * 1e3 + (p[3] || 0);
 }
 
 // ─── Map versions → last apidata.js commit ──────────────────────────────────
@@ -61,7 +61,7 @@ const byVersion = new Map(); // version → commit (last one wins: commits are o
 for (const c of commits) {
   const entry = walker.findVersionForCommitDate(new Date(c.date), entries);
   if (!entry) { log(`skip ${c.sha.slice(0, 10)} (${c.date.slice(0, 10)}): no changelog release covers it`); continue; }
-  byVersion.set(entry.version.replace(/-\d+$/, ''), c);
+  byVersion.set(entry.version, c); // full debian version: 6.2-1 and 6.2-2 were distinct docs releases
 }
 const versions = [...byVersion.keys()]
   .filter((v) => versionKey(v) <= versionKey(until))
