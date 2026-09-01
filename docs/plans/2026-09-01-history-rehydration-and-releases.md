@@ -1,6 +1,6 @@
 # Change plan: history rehydration and release tagging
 
-Status: Implemented 2026-09-01 (main rewritten, 69 tags pushed); awaiting first CI run for step 5/6 validation. Decisions: [ADR 0001](../decisions/0001-upstream-docs-version-is-the-release-identity-for-tags-and-releases.md), [ADR 0002](../decisions/0002-rewrite-main-once-with-per-version-historical-snapshots.md).
+Status: Complete 2026-09-01 — main rewritten (69 snapshots), CI validated: pve/9.2.4 and pbs/4.2.5 Releases with assets; quiet runs produce no commit, tag, or Release. Decisions: [ADR 0001](../decisions/0001-upstream-docs-version-is-the-release-identity-for-tags-and-releases.md), [ADR 0002](../decisions/0002-rewrite-main-once-with-per-version-historical-snapshots.md).
 
 ## Scope
 
