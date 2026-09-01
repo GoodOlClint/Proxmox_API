@@ -10,6 +10,7 @@ Machine-readable specifications for the [Proxmox VE](https://www.proxmox.com/en/
 | [pve/openapi/pve-openapi.pve{4-9}.json](pve/openapi/) | Per-major-version specs — only endpoints that exist in that PVE release |
 | [pve/pve-api.json](pve/pve-api.json) | Flat endpoint list with version history, permissions, and format annotations |
 | [pve/format-registry.json](pve/format-registry.json) | Validation rules (regex/enum/property-string) for every custom PVE format type, with version history |
+| [pve/CHANGELOG.md](pve/CHANGELOG.md) | Per-release changelog: endpoints introduced and parameters changed in each PVE version |
 | [pbs/openapi/pbs-openapi.json](pbs/openapi/pbs-openapi.json) | OpenAPI 3.0.3 spec for the current PBS API |
 | [pbs/pbs-api.json](pbs/pbs-api.json) | Flat PBS endpoint list with permissions |
 
@@ -37,6 +38,12 @@ bash tools/proxmox-api-parser/update-pbsapi.sh   # PBS → pbs/
 ```
 
 The PVE script fetches the live `apidoc.js` from pve.proxmox.com, clones the pve-docs repo to rebuild per-endpoint version history from its full commit log, and regenerates everything under `pve/`. The PBS script fetches `apidoc.js` from pbs.proxmox.com (same format, so the same parser handles both). A [scheduled GitHub Actions workflow](.github/workflows/update-proxmox-specs.yml) does both daily and commits when upstream changed.
+
+## Seeing what changed
+
+- **Between PVE releases**: [pve/CHANGELOG.md](pve/CHANGELOG.md) lists, for every PVE version back to 4.2, which endpoints were introduced and which parameters were added, removed, or changed. It is rendered from the pve-docs commit walk, so it updates automatically.
+- **Between regenerations**: the artifacts are compact JSON, so file diffs are unreadable. Instead, each CI commit's message carries the `diff-pveapi.js` summary — endpoints added, removed, and changed for PVE and PBS since the previous commit. `git log` on `pve/` or `pbs/` shows the history of API changes. Artifacts are deterministic (no timestamps), so a run with no upstream change produces no commit.
+- **Locally, any two versions**: `node tools/proxmox-api-parser/diff-pveapi.js --old <a>.json --new <b>.json` works on any two `pve-api.json`/`pbs-api.json` files, e.g. from `git show <rev>:pve/pve-api.json`.
 
 Split per-area endpoint files (for loading a single functional area) are not committed but can be generated locally with `node tools/proxmox-api-parser/parse-pveapi.js --split`.
 

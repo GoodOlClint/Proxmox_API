@@ -235,6 +235,14 @@ function extractEndpointMap(tree) {
 
 // ─── Diff two endpoint maps ─────────────────────────────────────────────────
 
+// Key-order-independent serialization: format objects are reordered between
+// apidata.js commits without semantic change
+function stableStringify(v) {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+  return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + stableStringify(v[k])).join(',') + '}';
+}
+
 /**
  * Compare two endpoint maps and return { added, removed, paramChanges, returnChanges }
  */
@@ -271,7 +279,7 @@ function diffEndpointMaps(oldMap, newMap) {
       if (!oldDetail.param_details[pName]) continue; // new param, already captured
       const oldP = oldDetail.param_details[pName];
       const newP = newDetail.param_details[pName];
-      if (oldP.type !== newP.type || oldP.optional !== newP.optional || oldP.format !== newP.format) {
+      if (oldP.type !== newP.type || oldP.optional !== newP.optional || stableStringify(oldP.format) !== stableStringify(newP.format)) {
         changedParams.push({
           name: pName,
           old: { type: oldP.type, optional: oldP.optional, format: oldP.format },

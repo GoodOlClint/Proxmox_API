@@ -27,11 +27,8 @@ jobs:
           key: pve-clones-${{ github.run_id }}
           restore-keys: pve-clones-
 
-      # parse-pveapi.js prefers the committed apidoc.js cache; remove it so the
-      # live version is fetched from pve.proxmox.com
       - name: Regenerate
         run: |
-          rm -f tools/proxmox-api-parser/apidoc.js
           bash tools/proxmox-api-parser/update-pveapi.sh
           bash tools/proxmox-api-parser/update-pbsapi.sh
 
@@ -42,7 +39,17 @@ jobs:
             echo "No upstream changes."
             exit 0
           fi
+          {
+            echo "Regenerate spec from upstream $(date -u +%F)"
+            for p in pve pbs; do
+              f="$p/$p-api.json"
+              if git diff --cached --quiet -- "$f" || ! git cat-file -e "HEAD:$f" 2>/dev/null; then continue; fi
+              echo
+              git show "HEAD:$f" > "$RUNNER_TEMP/$p-old.json"
+              node tools/proxmox-api-parser/diff-pveapi.js --old "$RUNNER_TEMP/$p-old.json" --new "$f" --output "$RUNNER_TEMP/$p-diff.json"
+            done
+          } > "$RUNNER_TEMP/commit-msg.txt"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Regenerate spec from upstream $(date -u +%F)"
+          git commit -F "$RUNNER_TEMP/commit-msg.txt"
           git push

@@ -19,6 +19,7 @@ echo "[update-pveapi] Building version history..."
 node "$SCRIPT_DIR/history-pveapi.js" --keep-repo
 
 echo "[update-pveapi] Running parser..."
+rm -f "$SCRIPT_DIR/apidoc.js"
 node "$SCRIPT_DIR/parse-pveapi.js" --output "$PVE_DIR/pve-api.json"
 
 echo "[update-pveapi] Building format version history..."
@@ -33,6 +34,9 @@ node "$SCRIPT_DIR/openapi-pveapi.js" --compact --all-versions \
   --api "$PVE_DIR/pve-api.json" \
   --formats "$PVE_DIR/format-registry.json" \
   --output "$PVE_DIR/openapi/pve-openapi.json"
+
+echo "[update-pveapi] Rendering changelog..."
+node "$SCRIPT_DIR/changelog-pveapi.js" --api "$PVE_DIR/pve-api.json" --output "$PVE_DIR/CHANGELOG.md"
 
 # Print stats
 SHA256=$(shasum -a 256 "$PVE_DIR/pve-api.json" | awk '{print $1}')

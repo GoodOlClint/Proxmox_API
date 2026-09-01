@@ -397,7 +397,6 @@ function generateSpec(endpoints, pveVersion) {
         name: 'AGPL-3.0',
         url: 'https://www.gnu.org/licenses/agpl-3.0.html',
       },
-      'x-generated-at': new Date().toISOString(),
       'x-source-sha256': api.meta.source_sha256 || null,
       'x-total-endpoints': endpoints.length,
     },

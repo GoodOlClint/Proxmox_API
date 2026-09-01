@@ -483,7 +483,6 @@ async function main() {
   // 8. Assemble output
   const output = {
     meta: {
-      generated_at: new Date().toISOString(),
       source_url: getArg('--source-url') || (inputPath ? path.resolve(inputPath) : SOURCE_URL),
       source_sha256: sha256,
       total_endpoints: endpoints.length,
