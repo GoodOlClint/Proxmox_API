@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-tags: true
 
       - uses: actions/cache@v6
         with:
@@ -39,17 +41,22 @@ jobs:
             echo "No upstream changes."
             exit 0
           fi
-          {
-            echo "Regenerate spec from upstream $(date -u +%F)"
-            for p in pve pbs; do
-              f="$p/$p-api.json"
-              if git diff --cached --quiet -- "$f" || ! git cat-file -e "HEAD:$f" 2>/dev/null; then continue; fi
-              echo
-              git show "HEAD:$f" > "$RUNNER_TEMP/$p-old.json"
-              node tools/proxmox-api-parser/diff-pveapi.js --old "$RUNNER_TEMP/$p-old.json" --new "$f" --output "$RUNNER_TEMP/$p-diff.json"
-            done
-          } > "$RUNNER_TEMP/commit-msg.txt"
+          echo "Regenerate spec from upstream $(date -u +%F)" > "$RUNNER_TEMP/commit-msg.txt"
+          for p in pve pbs; do
+            f="$p/$p-api.json"
+            if git diff --cached --quiet -- "$f" || ! git cat-file -e "HEAD:$f" 2>/dev/null; then continue; fi
+            touch "$RUNNER_TEMP/$p-changed"
+            git show "HEAD:$f" > "$RUNNER_TEMP/$p-old.json"
+            node tools/proxmox-api-parser/diff-pveapi.js --old "$RUNNER_TEMP/$p-old.json" --new "$f" --output "$RUNNER_TEMP/$p-diff.json" > "$RUNNER_TEMP/$p-notes.md"
+            { echo; cat "$RUNNER_TEMP/$p-notes.md"; } >> "$RUNNER_TEMP/commit-msg.txt"
+          done
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -F "$RUNNER_TEMP/commit-msg.txt"
           git push
+
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES_DIR: ${{ runner.temp }}
+        run: bash tools/proxmox-api-parser/tag-release.sh

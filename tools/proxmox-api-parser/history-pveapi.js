@@ -554,4 +554,6 @@ function main() {
   console.log(`\nOutput: ${outputPath}`);
 }
 
-main();
+module.exports = { parseChangelog, findVersionForCommitDate, friendlyVersion, extractSchemaTree, stableStringify, REPO_URL, APIDATA_PATH };
+
+if (require.main === module) main();

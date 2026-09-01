@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+/**
+ * rehydrate-pveapi.js — Build the historical snapshot chain (ADR 0002).
+ *
+ * One-time operation, run by an operator, never by CI. For every pve-docs
+ * release version (last apidata.js commit within it), generates pve-api.json
+ * and pve-openapi.json into a separate worktree on an orphan branch, committing
+ * with the upstream commit's date and tagging pve/<version>.
+ *
+ * Usage:
+ *   node rehydrate-pveapi.js --worktree <dir> --until <version> [--branch <name>]
+ *                            [--repo <pve-docs clone>] [--history <path>] [--formats <path>]
+ *
+ *   --until   highest version to include (the live version from resolve-version-pveapi.js);
+ *             newer upstream versions are left for CI to tag when the site publishes them
+ */
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+const walker = require('./history-pveapi.js');
+
+const args = process.argv.slice(2);
+function getArg(name) {
+  const idx = args.indexOf(name);
+  return idx === -1 ? null : args[idx + 1] || null;
+}
+
+const worktree = getArg('--worktree');
+const until = getArg('--until');
+if (!worktree || !until) {
+  process.stderr.write('Usage: --worktree <dir> --until <version> [--branch <name>]\n');
+  process.exit(1);
+}
+const branch = getArg('--branch') || 'rehydrate';
+const repo = getArg('--repo') || path.join(__dirname, '.pve-docs-clone');
+const historyPath = getArg('--history') || path.join(__dirname, 'endpoint-history.json');
+const formatsPath = getArg('--formats') || path.join(__dirname, '..', '..', 'pve', 'format-registry.json');
+const mainRepo = path.join(__dirname, '..', '..');
+
+const BOT = ['-c', 'user.name=goodolclint-claude[bot]', '-c', 'user.email=323206664+goodolclint-claude[bot]@users.noreply.github.com'];
+
+function log(msg) { process.stderr.write(`[rehydrate] ${msg}\n`); }
+function sh(cmd, opts = {}) {
+  return execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024, ...opts }).trim();
+}
+function versionKey(v) {
+  const p = v.split('.').map((n) => parseInt(n, 10) || 0);
+  return p[0] * 1e6 + p[1] * 1e3 + (p[2] || 0);
+}
+
+// ─── Map versions → last apidata.js commit ──────────────────────────────────
+
+const entries = walker.parseChangelog(fs.readFileSync(path.join(repo, 'debian', 'changelog'), 'utf8'));
+const commits = sh(`git log --format="%H %aI" -- "${walker.APIDATA_PATH}"`, { cwd: repo })
+  .split('\n').filter(Boolean).map((l) => { const [sha, date] = l.split(' '); return { sha, date }; }).reverse();
+
+const byVersion = new Map(); // version → commit (last one wins: commits are oldest-first)
+for (const c of commits) {
+  const entry = walker.findVersionForCommitDate(new Date(c.date), entries);
+  if (!entry) { log(`skip ${c.sha.slice(0, 10)} (${c.date.slice(0, 10)}): no changelog release covers it`); continue; }
+  byVersion.set(entry.version.replace(/-\d+$/, ''), c);
+}
+const versions = [...byVersion.keys()]
+  .filter((v) => versionKey(v) <= versionKey(until))
+  .sort((a, b) => new Date(byVersion.get(a).date) - new Date(byVersion.get(b).date));
+log(`${commits.length} apidata.js commits → ${byVersion.size} versions, ${versions.length} at or below ${until}`);
+
+// ─── Orphan branch in a fresh worktree ──────────────────────────────────────
+
+if (fs.existsSync(worktree)) { log(`worktree ${worktree} already exists; remove it first`); process.exit(1); }
+if (sh(`git branch --list "${branch}"`, { cwd: mainRepo })) { log(`branch ${branch} already exists; delete it first`); process.exit(1); }
+sh(`git worktree add --detach "${worktree}" HEAD`, { cwd: mainRepo });
+sh(`git checkout -q --orphan "${branch}"`, { cwd: worktree });
+sh('git rm -rfq .', { cwd: worktree });
+fs.mkdirSync(path.join(worktree, 'pve', 'openapi'), { recursive: true });
+
+const tmpApidata = path.join(worktree, '.apidata.js');
+for (const [i, version] of versions.entries()) {
+  const c = byVersion.get(version);
+  const day = c.date.slice(0, 10);
+  fs.writeFileSync(tmpApidata, sh(`git show ${c.sha}:${walker.APIDATA_PATH}`, { cwd: repo }), 'utf8');
+  sh(`node "${path.join(__dirname, 'parse-pveapi.js')}" --input "${tmpApidata}" --history "${historyPath}" --as-of ${day} --docs-version ${version} --output "${path.join(worktree, 'pve', 'pve-api.json')}"`);
+  sh(`node "${path.join(__dirname, 'openapi-pveapi.js')}" --compact --api "${path.join(worktree, 'pve', 'pve-api.json')}" --formats "${formatsPath}" --output "${path.join(worktree, 'pve', 'openapi', 'pve-openapi.json')}"`);
+  fs.unlinkSync(tmpApidata);
+  const count = JSON.parse(fs.readFileSync(path.join(worktree, 'pve', 'pve-api.json'), 'utf8')).meta.total_endpoints;
+  sh('git add pve', { cwd: worktree });
+  sh(`git ${BOT.map((a) => `'${a}'`).join(' ')} commit -q -m "PVE API as of pve-docs ${version} (${day})" -m "Source: proxmox/pve-docs ${c.sha} api-viewer/apidata.js; ${count} endpoints. Generated by tools/proxmox-api-parser/rehydrate-pveapi.js (ADR 0002)."`,
+    { cwd: worktree, env: { ...process.env, GIT_AUTHOR_DATE: c.date, GIT_COMMITTER_DATE: c.date } });
+  sh(`git ${BOT.map((a) => `'${a}'`).join(' ')} tag -a -m "pve/${version}" pve/${version}`, { cwd: worktree });
+  log(`${String(i + 1).padStart(2)}/${versions.length} pve/${version} ${day} ${count} endpoints`);
+}
+
+console.log(`${branch} ${sh('git rev-parse HEAD', { cwd: worktree })} ${versions.length} snapshots`);
