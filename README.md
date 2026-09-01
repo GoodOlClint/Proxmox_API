@@ -39,6 +39,15 @@ bash tools/proxmox-api-parser/update-pbsapi.sh   # PBS → pbs/
 
 The PVE script fetches the live `apidoc.js` from pve.proxmox.com, clones the pve-docs repo to rebuild per-endpoint version history from its full commit log, and regenerates everything under `pve/`. The PBS script fetches `apidoc.js` from pbs.proxmox.com (same format, so the same parser handles both). A [scheduled GitHub Actions workflow](.github/workflows/update-proxmox-specs.yml) does both daily and commits when upstream changed.
 
+## Releases and tags
+
+Every upstream API version is a git tag: `pve/<version>` and `pbs/<version>`, where the version is the Proxmox docs package version shown on the product's documentation site (e.g. `pve/9.2.4`, `pbs/4.2.5`). Each artifact also records it as `meta.docs_version`. A tag's tree holds the spec as it stood at that version, at the same paths as `main`.
+
+- **Watch for updates**: GitHub → Watch → Custom → Releases. From 2026-09 onward, every new version is a GitHub Release with the endpoint diff as release notes and the spec files attached as assets.
+- **Pin a version**: `git checkout pve/8.3.0`, or fetch `https://raw.githubusercontent.com/GoodOlClint/Proxmox_API/pve/8.3.0/pve/openapi/pve-openapi.json`.
+- **History**: PVE tags go back to `pve/4.2` (2016), rebuilt from the pve-docs commit history; those historical tags have no Release objects. PBS tags start at `pbs/4.2.5`.
+- If upstream changes the API without changing the version string, the tag gets a numeric suffix (`pve/9.2.4-2`).
+
 ## Seeing what changed
 
 - **Between PVE releases**: [pve/CHANGELOG.md](pve/CHANGELOG.md) lists, for every PVE version back to 4.2, which endpoints were introduced and which parameters were added, removed, or changed. It is rendered from the pve-docs commit walk, so it updates automatically.

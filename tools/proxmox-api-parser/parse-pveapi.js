@@ -56,6 +56,8 @@ const outputPath = getArg('--output') || path.join(__dirname, 'pve-api.json');
 const pretty = hasFlag('--pretty');
 const split = hasFlag('--split');
 const historyPath = getArg('--history') || path.join(__dirname, 'endpoint-history.json');
+const asOf = getArg('--as-of');
+const docsVersion = getArg('--docs-version');
 
 const SOURCE_URL = 'https://pve.proxmox.com/pve-docs/api-viewer/apidoc.js';
 const CACHE_PATH = path.join(__dirname, 'apidoc.js');
@@ -361,20 +363,6 @@ function buildTree(nodes) {
 
 // ─── Version hint extraction ────────────────────────────────────────────────
 
-function extractVersionHint(source) {
-  const head = source.substring(0, 50000); // check first ~500 lines worth
-  const patterns = [
-    /pveversion['":\s]+['"]([^'"]+)['"]/i,
-    /version['":\s]+['"](\d+\.\d+[^'"]*)['"]/i,
-    /pvever['":\s]+['"]([^'"]+)['"]/i,
-  ];
-  for (const pat of patterns) {
-    const m = head.match(pat);
-    if (m) return m[1];
-  }
-  return null;
-}
-
 // ─── Output validation ─────────────────────────────────────────────────────
 
 function validateOutput(output) {
@@ -451,10 +439,11 @@ async function main() {
           ep.since_pve_major = entry.introduced.since_pve_major;
           ep.since_date = entry.introduced.since_date;
         }
-        if (entry.changes && entry.changes.length > 0) {
-          ep.version_changes = entry.changes;
-          ep.last_changed_version = entry.changes[entry.changes.length - 1].version;
-          ep.last_changed_date = entry.changes[entry.changes.length - 1].date;
+        const changes = asOf ? (entry.changes || []).filter((c) => c.date <= asOf) : (entry.changes || []);
+        if (changes.length > 0) {
+          ep.version_changes = changes;
+          ep.last_changed_version = changes[changes.length - 1].version;
+          ep.last_changed_date = changes[changes.length - 1].date;
         }
         historyEnriched++;
       }
@@ -475,7 +464,6 @@ async function main() {
   log(`Found ${endpoints.length} endpoints across ${areaCount} functional areas`);
 
   // 6. Version hint
-  const versionHint = extractVersionHint(source);
 
   // 7. Build tree
   const tree = buildTree(apiSchema);
@@ -487,7 +475,8 @@ async function main() {
       source_sha256: sha256,
       total_endpoints: endpoints.length,
       total_paths: uniquePaths.size,
-      pve_version_hint: versionHint,
+      docs_version: docsVersion || null,
+      history_as_of: asOf || null,
     },
     endpoints: endpoints,
     tree: tree,

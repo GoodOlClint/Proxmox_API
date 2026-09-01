@@ -18,9 +18,12 @@ fi
 echo "[update-pveapi] Building version history..."
 node "$SCRIPT_DIR/history-pveapi.js" --keep-repo
 
-echo "[update-pveapi] Running parser..."
+echo "[update-pveapi] Resolving upstream version..."
 rm -f "$SCRIPT_DIR/apidoc.js"
-node "$SCRIPT_DIR/parse-pveapi.js" --output "$PVE_DIR/pve-api.json"
+read -r DOCS_VERSION AS_OF <<< "$(node "$SCRIPT_DIR/resolve-version-pveapi.js" --product pve)"
+
+echo "[update-pveapi] Running parser (docs $DOCS_VERSION, history as of $AS_OF)..."
+node "$SCRIPT_DIR/parse-pveapi.js" --docs-version "$DOCS_VERSION" --as-of "$AS_OF" --output "$PVE_DIR/pve-api.json"
 
 echo "[update-pveapi] Building format version history..."
 node "$SCRIPT_DIR/format-history-pveapi.js" --keep-repos
@@ -44,6 +47,7 @@ COUNT=$(node -e "console.log(require('$PVE_DIR/pve-api.json').meta.total_endpoin
 FORMATS=$(node -e "console.log(Object.keys(require('$PVE_DIR/format-registry.json').formats).length)")
 
 echo "[update-pveapi] SHA256:    $SHA256"
+echo "[update-pveapi] Version:   $DOCS_VERSION"
 echo "[update-pveapi] Endpoints: $COUNT"
 echo "[update-pveapi] Formats:   $FORMATS"
 echo "[update-pveapi] Done."

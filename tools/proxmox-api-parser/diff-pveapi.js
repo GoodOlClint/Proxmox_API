@@ -163,7 +163,7 @@ const diffOutputPath = outArg ? path.resolve(outArg) : path.join(path.dirname(pa
 fs.writeFileSync(diffOutputPath, JSON.stringify(diffResult, null, 2), 'utf8');
 
 // Print summary
-console.log(`PVE API Diff: ${oldPath} → ${newPath}`);
+console.log(`${path.basename(newPath, '.json').replace(/-api$/, '').toUpperCase()} API diff`);
 console.log(`  Old: ${oldData.endpoints.length} endpoints (SHA: ${oldData.meta.source_sha256.substring(0, 12)}...)`);
 console.log(`  New: ${newData.endpoints.length} endpoints (SHA: ${newData.meta.source_sha256.substring(0, 12)}...)`);
 console.log(`  Added:   ${added.length}`);
@@ -188,4 +188,4 @@ if (removed.length > 0) {
   removed.forEach((e) => console.log(`    - ${e.method} ${e.path} [${e.functional_area}]`));
 }
 
-console.log(`\nDiff written to: ${diffOutputPath}`);
+process.stderr.write(`Diff written to: ${diffOutputPath}\n`);

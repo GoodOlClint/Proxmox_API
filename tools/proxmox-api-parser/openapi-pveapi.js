@@ -388,7 +388,7 @@ function generateSpec(endpoints, pveVersion) {
         `.\n\n` +
         `This spec includes x-since-version extensions on endpoints and parameters ` +
         `to indicate when each was introduced.`,
-      version: pveVersion ? `${pveVersion}.0` : (api.meta.pve_version_hint || '9.0'),
+      version: pveVersion ? `${pveVersion}.0` : (api.meta.docs_version || '0.0'),
       contact: {
         name: 'Proxmox',
         url: 'https://www.proxmox.com',
