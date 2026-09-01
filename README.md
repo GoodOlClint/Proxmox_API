@@ -43,7 +43,7 @@ The PVE script fetches the live `apidoc.js` from pve.proxmox.com, clones the pve
 
 Every upstream API version is a git tag: `pve/<version>` and `pbs/<version>`, where the version is the Proxmox docs package version shown on the product's documentation site (e.g. `pve/9.2.4`, `pbs/4.2.5`). Each artifact also records it as `meta.docs_version`. A tag's tree holds the spec as it stood at that version, at the same paths as `main`.
 
-- **Watch for updates**: GitHub → Watch → Custom → Releases. From 2026-09 onward, every new version is a GitHub Release with the endpoint diff as release notes and the spec files attached as assets.
+- **Watch for updates**: GitHub → Watch → Custom → Releases. The current version of each product always has a GitHub Release with the spec files attached as assets; from 2026-09 onward each new version gets one, with the endpoint diff as release notes.
 - **Pin a version**: `git checkout pve/8.3.0`, or fetch `https://raw.githubusercontent.com/GoodOlClint/Proxmox_API/pve/8.3.0/pve/openapi/pve-openapi.json`.
 - **History**: PVE tags go back to `pve/4.2` (2016), rebuilt from the pve-docs commit history; those historical tags have no Release objects. PBS tags start at `pbs/4.2.5`.
 - If upstream changes the API without changing the version string, the tag gets a revision suffix (`pve/9.2.4-r2`). Historical PVE versions before 7.0 keep their original debian-style numbering (`pve/6.2-1`).

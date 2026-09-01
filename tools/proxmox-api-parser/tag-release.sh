@@ -2,10 +2,13 @@
 # tag-release.sh — Tag and publish a GitHub Release for each product whose artifact
 # changed in HEAD (ADR 0001). Run by CI after the artifact commit is pushed.
 #
-# Inputs (per product p in pve pbs), written by the workflow's commit step:
-#   $NOTES_DIR/$p-changed   marker: this product's <p>-api.json changed in HEAD
-#   $NOTES_DIR/$p-notes.md  release notes (diff summary)
-# Tags: <p>/<docs_version>; if that tag exists with different content, <p>/<docs_version>-N.
+# Invariant: the tag that covers HEAD's content has a GitHub Release. Runs on every
+# CI run, not only when an artifact changed, so a version whose tag came from the
+# history backfill gets its Release the first time it is the live version.
+#
+# Optional inputs (per product p in pve pbs), written by the workflow's commit step:
+#   $NOTES_DIR/$p-notes.md  release notes (diff summary); a summary line is used otherwise
+# Tags: <p>/<docs_version>; if that tag exists with different content, <p>/<docs_version>-rN.
 set -euo pipefail
 
 NOTES_DIR="${NOTES_DIR:?set NOTES_DIR}"
@@ -25,8 +28,8 @@ same_endpoints() {
 }
 
 for p in pve pbs; do
-  [ -f "$NOTES_DIR/$p-changed" ] || continue
   f="$p/$p-api.json"
+  [ -f "$f" ] || continue
   ver=$(node -e "console.log(require('./$f').meta.docs_version || '')")
   if [ -z "$ver" ]; then
     echo "[tag-release] $p: no docs_version in $f, not tagging" >&2
@@ -41,10 +44,18 @@ for p in pve pbs; do
     fi
     n=$((n+1)); tag="$base-r$n"
   done
-  [ "$covered" = 1 ] && continue
-  echo "[tag-release] tagging $tag"
-  git tag -a -m "$tag" "$tag"
-  if [ "$DRY_RUN" = 1 ]; then continue; fi
-  git push origin "$tag"
-  gh release create "$tag" --title "$tag" --notes-file "$NOTES_DIR/$p-notes.md" "$f" "$p"/openapi/*.json
+  if [ "$covered" != 1 ]; then
+    echo "[tag-release] tagging $tag"
+    git tag -a -m "$tag" "$tag"
+    [ "$DRY_RUN" = 1 ] || git push origin "$tag"
+  fi
+  [ "$DRY_RUN" = 1 ] && continue
+  if gh release view "$tag" >/dev/null 2>&1; then continue; fi
+  notes="$NOTES_DIR/$p-notes.md"
+  if [ ! -f "$notes" ]; then
+    count=$(node -e "console.log(require('./$f').meta.total_endpoints)")
+    printf '%s API %s — %s endpoints. Per-release changes: see pve/CHANGELOG.md for PVE; the commit history of %s for regeneration diffs.\n' "$(echo "$p" | tr a-z A-Z)" "$ver" "$count" "$p/" > "$notes"
+  fi
+  echo "[tag-release] release $tag"
+  gh release create "$tag" --title "$tag" --notes-file "$notes" "$f" "$p"/openapi/*.json
 done

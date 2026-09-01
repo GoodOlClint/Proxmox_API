@@ -45,7 +45,6 @@ jobs:
           for p in pve pbs; do
             f="$p/$p-api.json"
             if git diff --cached --quiet -- "$f" || ! git cat-file -e "HEAD:$f" 2>/dev/null; then continue; fi
-            touch "$RUNNER_TEMP/$p-changed"
             git show "HEAD:$f" > "$RUNNER_TEMP/$p-old.json"
             node tools/proxmox-api-parser/diff-pveapi.js --old "$RUNNER_TEMP/$p-old.json" --new "$f" --output "$RUNNER_TEMP/$p-diff.json" > "$RUNNER_TEMP/$p-notes.md"
             { echo; cat "$RUNNER_TEMP/$p-notes.md"; } >> "$RUNNER_TEMP/commit-msg.txt"
