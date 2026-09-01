@@ -46,7 +46,7 @@ Every upstream API version is a git tag: `pve/<version>` and `pbs/<version>`, wh
 - **Watch for updates**: GitHub → Watch → Custom → Releases. From 2026-09 onward, every new version is a GitHub Release with the endpoint diff as release notes and the spec files attached as assets.
 - **Pin a version**: `git checkout pve/8.3.0`, or fetch `https://raw.githubusercontent.com/GoodOlClint/Proxmox_API/pve/8.3.0/pve/openapi/pve-openapi.json`.
 - **History**: PVE tags go back to `pve/4.2` (2016), rebuilt from the pve-docs commit history; those historical tags have no Release objects. PBS tags start at `pbs/4.2.5`.
-- If upstream changes the API without changing the version string, the tag gets a numeric suffix (`pve/9.2.4-2`).
+- If upstream changes the API without changing the version string, the tag gets a revision suffix (`pve/9.2.4-r2`). Historical PVE versions before 7.0 keep their original debian-style numbering (`pve/6.2-1`).
 
 ## Seeing what changed
 

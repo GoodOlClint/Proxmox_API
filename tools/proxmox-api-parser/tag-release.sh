@@ -32,13 +32,14 @@ for p in pve pbs; do
     echo "[tag-release] $p: no docs_version in $f, not tagging" >&2
     continue
   fi
-  # walk <p>/<ver>, <p>/<ver>-2, ... : reuse none if one already holds this content
+  # walk <p>/<ver>, <p>/<ver>-r2, ... : reuse none if one already holds this content
+  # (-rN, not -N: old-scheme docs versions like 6.2-1 carry a debian revision)
   base="$p/$ver"; tag="$base"; n=1; covered=0
   while git rev-parse -q --verify "refs/tags/$tag" >/dev/null; do
     if same_endpoints "$tag" "$f"; then
       echo "[tag-release] $tag already covers this content"; covered=1; break
     fi
-    n=$((n+1)); tag="$base-$n"
+    n=$((n+1)); tag="$base-r$n"
   done
   [ "$covered" = 1 ] && continue
   echo "[tag-release] tagging $tag"
