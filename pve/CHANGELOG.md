@@ -8,7 +8,7 @@ Endpoints introduced and changed per PVE release, derived from the commit histor
 
 - `DELETE /cluster/qemu/custom-cpu-models/{cputype}` — Delete a custom CPU model definition.
 - `DELETE /nodes/{node}/ceph/fs/{name}` — Destroy a Ceph filesystem. Refuses if any PVE storage entry of type 'cephfs' still references the filesystem and is not disabled. Optionally also removes the storage entries and/or the underlying metadata and data pools.
-- `GET /cluster/ceph/health-mute`
+- `GET /cluster/ceph/health-mute` — Get the currently muted Ceph health checks.
 - `GET /cluster/qemu` — Cluster-wide QEMU index
 - `GET /cluster/qemu/cpu-flags` — List of available CPU flags. Currently only implemented for x86_64, returns an empty list for aarch64.
 - `GET /cluster/qemu/custom-cpu-models` — List all custom CPU model definitions visible to the user.
@@ -17,7 +17,7 @@ Endpoints introduced and changed per PVE release, derived from the commit histor
 - `POST /cluster/ceph/restart-bulk` — Cluster-wide rolling restart of all Ceph daemons of the given type. For MON/MGR/MDS each daemon is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For OSDs the cluster path orchestrates the per-node endpoint at /nodes/{node}/ceph/restart-bulk on each node in turn, inheriting that endpoint's per-OSD 'noout' handling and resume support. The 'noout' flag itself is not exposed by this endpoint as it is OSD-specific (and for OSDs handled by the per-node sub-tasks).
 - `POST /cluster/qemu/custom-cpu-models` — Add a custom CPU model definition.
 - `POST /nodes/{node}/ceph/restart-bulk` — Rolling restart of all Ceph OSDs on this node. Each OSD is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For non-OSD Ceph daemons, use the cluster-wide endpoint at /cluster/ceph/restart-bulk. The 'noout' flag is applied only to the OSDs targeted by this run, so unrelated OSDs on other nodes that fail during the restart window still get out-marked normally. Aborting the resulting task (for example via 'pvesh task stop') triggers a SIGTERM handler that unsets the per-OSD 'noout' if this endpoint set it. Per-daemon progress is checkpointed in Ceph's config-key store ('pve/ceph-bulk-restart/node/<node>'), so an aborted run can be resumed by re-issuing this endpoint with 'resume=1'.
-- `PUT /cluster/ceph/health-mute/{code}`
+- `PUT /cluster/ceph/health-mute/{code}` — Mute or unmute a Ceph health check. A muted check no longer counts towards the cluster status, but stays visible and keeps being evaluated.
 - `PUT /cluster/qemu/custom-cpu-models/{cputype}` — Update a custom CPU model definition.
 
 ### Changed endpoints (66)
