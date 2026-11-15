@@ -14,10 +14,10 @@ Endpoints introduced and changed per PVE release, derived from the commit histor
 - `GET /cluster/qemu/custom-cpu-models` — List all custom CPU model definitions visible to the user.
 - `GET /cluster/qemu/custom-cpu-models/{cputype}` — Retrieve details about a specific custom CPU model.
 - `GET /nodes/{node}/ceph/releases` — List all known Ceph releases, marking which ones can be installed on this node.
-- `GET /nodes/{node}/qemu/{vmid}/agent/get-cpustats`
-- `GET /nodes/{node}/qemu/{vmid}/agent/get-disks`
-- `GET /nodes/{node}/qemu/{vmid}/agent/get-diskstats`
-- `GET /nodes/{node}/qemu/{vmid}/agent/get-load`
+- `GET /nodes/{node}/qemu/{vmid}/agent/get-cpustats` — Execute get-cpustats.
+- `GET /nodes/{node}/qemu/{vmid}/agent/get-disks` — Execute get-disks.
+- `GET /nodes/{node}/qemu/{vmid}/agent/get-diskstats` — Execute get-diskstats.
+- `GET /nodes/{node}/qemu/{vmid}/agent/get-load` — Execute get-load.
 - `POST /cluster/ceph/restart-bulk` — Cluster-wide rolling restart of all Ceph daemons of the given type. For MON/MGR/MDS each daemon is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For OSDs the cluster path orchestrates the per-node endpoint at /nodes/{node}/ceph/restart-bulk on each node in turn, inheriting that endpoint's per-OSD 'noout' handling and resume support. The 'noout' flag itself is not exposed by this endpoint as it is OSD-specific (and for OSDs handled by the per-node sub-tasks).
 - `POST /cluster/qemu/custom-cpu-models` — Add a custom CPU model definition.
 - `POST /nodes/{node}/ceph/restart-bulk` — Rolling restart of all Ceph OSDs on this node. Each OSD is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For non-OSD Ceph daemons, use the cluster-wide endpoint at /cluster/ceph/restart-bulk. The 'noout' flag is applied only to the OSDs targeted by this run, so unrelated OSDs on other nodes that fail during the restart window still get out-marked normally. Aborting the resulting task (for example via 'pvesh task stop') triggers a SIGTERM handler that unsets the per-OSD 'noout' if this endpoint set it. Per-daemon progress is checkpointed in Ceph's config-key store ('pve/ceph-bulk-restart/node/<node>'), so an aborted run can be resumed by re-issuing this endpoint with 'resume=1'.
